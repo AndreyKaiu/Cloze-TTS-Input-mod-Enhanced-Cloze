@@ -1,0 +1,12 @@
+{
+    "conflicts": [
+        "enhanced_cloze"
+    ],
+    "mod": 1784132002,
+    "homepage": "",
+    "name": "Cloze TTS-Input mod Enhanced Cloze",
+    "min_point_version": 250902,
+    "max_point_version": 260500,
+    "branch_index": 0,
+    "disabled": false
+}

@@ -1,0 +1,17 @@
+{
+    "scrollToClozeOnToggle": true,
+    "animateScroll": true,
+    "showHintsForPseudoClozes": true,
+    "underlineRevealedPseudoClozes": true,
+    "underlineRevealedGenuineClozes": true,
+    "revealPseudoClozesByDefault": false,
+    "revealNextGenuineClozeShortcut": "Ctrl+J",
+    "revealAllGenuineClozesShortcut": "Ctrl+Shift+J",
+    "revealNextPseudoClozeShortcut": "Ctrl+N",
+    "revealAllPseudoClozesShortcut": "Ctrl+Shift+N",
+    "swapLeftAndRightBorderActions": false,
+    "googleTranslateIntoLanguage": "en",
+    "ttsSoundEnable": true,
+    "inputEnable": false,
+    "floatingPanelEnable": true
+}

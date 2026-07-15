@@ -1,0 +1,724 @@
+.card {
+    font-family: arial;
+    font-size: 20px;
+    line-height: 1.5;
+    text-align: justify;
+    color: black;
+    background-color: white;
+}
+.nightMode.card {
+    color: white;
+    background-color: black;    
+}
+
+#card-body {
+    /* font: 17px/1.65em 'Avenir Next'; */
+    /* font-family: arial;
+    font-size: 20px; */
+    line-height: 1.5;
+    text-align: justify;
+    margin-top: 30px;
+    margin-bottom: 60px;
+}
+
+   
+.content {
+    padding-left: 0.5em;
+    border-left: 4px solid transparent;
+}
+
+.header {
+    font-weight: bold;
+    font-size: 16px;
+    padding-left: 0.5em;
+}
+
+.header-red {
+    border-left: 4px solid #db4437;
+    color: #db4437;
+}
+
+.header-green {
+    border-left: 4px solid #0f9d58;
+    color: #0f9d58;
+}
+
+.header-blue {
+    border-left: 4px solid #4285f4;
+    color: #4285f4;
+}
+
+.header-yellow {
+    border-left: 4px solid #f4b400;
+    color: #f4b400;
+}
+
+.genuine-cloze input, .genuine-cloze input:focus {
+    border-width: 0px;
+    background-color: transparent;    
+    color: black;
+    outline: none;
+    border-top: none;
+    border-bottom: none;
+    border-left: 1px solid #00000020;
+    border-right: 1px solid #00000020;
+    position: relative;
+    top: 0px;
+    font-family: arial;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.pseudo-cloze input, .pseudo-cloze input:focus {
+    border-width: 0px;
+    background-color: transparent;   
+    color: black; 
+    outline: none;
+    border-top: none;
+    border-bottom: none;
+    border-left: 1px solid #00000020;
+    border-right: 1px solid #00000020;
+    position: relative;
+    top: 0px;
+    font-family: arial;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.nightMode .genuine-cloze input, .nightMode .genuine-cloze input:focus {
+    color: #ffff7f;
+    background-color: #1e1e0f;
+    font-weight: normal;
+    letter-spacing: 0.6px;
+    border-color: gray;
+}
+
+.nightMode .pseudo-cloze input, .nightMode  .pseudo-cloze input:focus {
+    color: #abe4ff;
+    background-color: #1e1e0f;
+    font-weight: normal;
+    letter-spacing: 0.6px;
+    border-color: gray;
+}
+
+    
+.genuine-cloze {
+    /* color: red; */
+    font-weight: bold;
+    letter-spacing: 0.6px; 
+    background-color: #ffff7f;  
+    /* border-bottom: 2px solid #ff5c82; */
+}
+.nightMode .genuine-cloze {
+    color:  #ffff7f;
+    background-color: #19190c;
+    font-weight: normal;
+}
+.genuine-cloze span {
+    /* color: red !important; */
+}
+
+.pseudo-cloze {
+    /* color: blue; */
+    /* font-weight: 600; */
+    letter-spacing: 0.6px;
+    font-weight: bold;
+    background-color: #8adcff;   
+    /* border-bottom: 2px solid #4285f4; */ 
+}
+.nightMode .pseudo-cloze {
+    color: #56a3ff; /* #abe4ff; */
+    background-color: #19190c;   
+    font-weight: normal;
+    letter-spacing: 0.6px;
+}
+
+.genuine-cloze[show-state="hint"] {
+    /* border-bottom: 0px solid #ff5c82;     */
+    letter-spacing: 0.6px;
+}
+.pseudo-cloze[show-state="hint"] {
+    /* border-bottom: 0px solid #4285f4; */   
+    letter-spacing: 0.6px;
+}
+.genuine-cloze[show-state="answer"] {
+    /* border-bottom: 1.5px solid #ff5c82; */    
+    letter-spacing: 0.6px;
+}
+.pseudo-cloze[show-state="answer"] {
+    /* border-bottom: 1.5px solid #4285f4;  */  
+    letter-spacing: 0.6px;
+}
+
+
+.nightMode .genuine-cloze[show-state="hint"] {    
+    background-color: #19190c;
+    border-bottom: 0px;
+    font-weight: normal;
+    letter-spacing: 0.6px;
+}
+.nightMode .pseudo-cloze[show-state="hint"] {    
+    background-color: #19190c;
+    border-bottom: 0px;
+    font-weight: normal;
+    letter-spacing: 0.px;
+}
+
+/* We will show the highlighted areas separately in color */
+.genuine-cloze b, .pseudo-cloze b {    
+    font-style: normal;
+    color: red;
+}
+
+.genuine-cloze i, .pseudo-cloze i {    
+    font-style: normal;
+    color: blue;    
+}
+
+.genuine-cloze u, .pseudo-cloze u {  
+    text-decoration: none;      
+    font-style: normal;
+    color: green;    
+}
+
+
+#show-one-cloze-left,
+#show-one-cloze-right,
+#no-more-cloze {
+    height: 100%;
+    width: 30px;
+    position: fixed;
+    z-index: 9;
+    top: 0;
+    background-color: transparent;
+}
+
+#show-one-cloze-left {
+    left: 0;
+}
+
+#show-one-cloze-right {
+    right: 0;
+}
+
+#no-more-cloze {
+    width: 10px;
+    background-color: #db4437;
+    left: 0;
+    display: none;
+}
+
+#show-all-pseudo-clozes {
+    height: 20px;
+    width: 100%;
+    position: fixed;
+    z-index: 9;
+    top: 0;
+    left: 0;
+    background-color: transparent;
+}
+
+.mobile ol,
+.mobile ul,
+.mobile li {
+    margin-left: -0.5em;
+}
+
+.mobile li {
+    margin: 0.1em, inherit;
+}
+
+table {
+    border-collapse: collapse;
+    margin: 0.5em;
+}
+
+thead tr,
+tfoot tr {
+    border-top: 2px solid #0f9d58;
+    border-bottom: 2px solid #0f9d58;
+}
+
+td,
+th {
+    border: 1px solid #0f9d58;
+    padding: 0.3em 0.5em;
+}
+
+hr {
+    border-top: 1px solid #aaaaaa;
+    width: 100%;
+    margin: 3px;
+    padding: 0;
+}
+
+pre {
+    border-left: 2px solid #0f9d58;
+    padding-left: 10px;
+}
+
+code,
+kbd,
+var,
+samp,
+tt {
+    background-color: #fdf3d6;
+}
+
+.disable-select {
+    -webkit-touch-callout: none;
+    user-select: none;
+}
+
+
+.tts-controls {
+    display: flex;
+    position: fixed;
+    bottom: -3px;
+    left: 0px;
+    right: 0px;        
+    /* justify-content: flex-end; */
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 0px;
+    padding: 8px;    
+    background: #f5f5f5;
+    border-radius: 8px;  
+    outline-color: black;
+    border-color: black;
+    flex-wrap: wrap;
+    user-select: none !important;
+    width: 100%;
+    z-index: 1000;
+}
+.nightMode .tts-controls {
+    background: #151515;
+}
+
+#qa_box .tts-controls { /* for https://ankiuser.net */
+    /* bottom: 80px;  */   
+    bottom: 15%;
+}
+
+
+.controls-row {
+    display: inline-flex;
+    /* display: block; */
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+    /* background-color: rgba(255, 255, 255, 1); */
+    background: #f5f5f5;
+    align-content: center;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+}
+.nightMode .controls-row {
+    /* background-color: rgba(0, 0, 0, 1); */   
+    background: #151515; 
+}
+
+
+.control-btn {
+    margin: 0px !important;
+    padding: 0px 10px !important;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    color: black !important;
+    background: white !important;
+    cursor: pointer;
+    font-size: 16px !important;
+    /* transition: all 0.2s ease; */
+    white-space: nowrap;
+    user-select: none;
+}
+.nightMode .control-btn {
+    background: black !important;  
+    color: white !important;  
+}
+
+.tts-sound-all {
+    margin: 5px !important;
+    padding: 0px 5px !important;
+    border: 1px solid #ccc;
+    border-radius: 5px !important;
+    color: black !important;
+    background: white !important;
+    cursor: pointer;
+    font-size: 16px !important;
+    /* transition: all 0.2s ease; */
+    white-space: nowrap;
+    user-select: none;      
+}
+.nightMode .tts-sound-all {
+    background: black !important;
+    color: white !important;
+}
+
+
+/* ============================================================
+   FLOATING BLOCK WITH BUTTONS
+   ============================================================ */
+
+.floating-toolbar {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 9999;
+    background: #FFFFFF;
+    border: 1px solid #ddd;
+    font-size: 16px !important;
+    border-radius: 10px;
+    /* padding: 6px 10px; */
+    padding: 3px 7px;
+    margin: 0px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    opacity: 0;
+    /* transform: scale(0.9) translateY(-5px); */
+    transition: opacity 0.2s ease, transform 0.2s ease;    
+    gap: 4px;
+    display: none;
+    opacity: 0.7;
+    user-select: none !important;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.floating-toolbar.show {
+    display: flex;
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+/* Toolbar buttons */
+.toolbar-btn {
+    /* padding: 6px 10px; */
+    padding: 3px 7px;
+    margin: 0px;
+    background: #FFFFFF;
+    /* border: none; */
+    border: 1.5px solid transparent; /* Temporarily, so it doesn't jump later */
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    /* transition: background 0.2s, transform 0.1s; */
+    /* transform: scale(1.15); */
+    color: #333;
+    line-height: 1;
+    opacity: 1;    
+}
+
+.toolbar-btn:hover {
+    background: #f0f0f0;
+    border: 1.5px solid;
+}
+
+.toolbar-btn:active {
+    transform: scale(1.0);    
+}
+
+/* Separator between buttons */
+.toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background: #ddd;
+    margin: 0 4px;
+}
+
+/* Specific styles for buttons */
+.toolbar-btn.tts-sound-float:hover {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.toolbar-btn.translate-float:hover {
+    background: #e3f2fd;
+    color: #c62828;
+}
+
+.toolbar-btn.copy-float:hover {
+    background: #fce4ec;
+    color: #1565c0; 
+}
+
+.toolbar-btn.findgoogle-float:hover {
+    background: #e3f2fd;
+    color: #c62828;
+}
+
+.toolbar-btn.aigoogle-float:hover {
+    background: #e3f2fd;
+    color: #c62828;
+}
+
+.toolbar-btn.close-float:hover {
+    background: #ffebee;
+    color: #1565c0;
+}
+
+
+
+
+.control-btn:hover {
+    background: #eeeeee;
+    border: 1px solid #ccc;
+}
+.nightMode .control-btn:hover {
+    background: #111111;
+    border: 1px solid #ccc;
+}
+
+.control-btn.active {
+    border-color: #4CAF50;
+    background: #e8f5e9;
+    font-weight: bold;
+}
+.nightMode .control-btn.active {
+    background: #050505;
+}
+
+.control-btn.active:hover {
+    background: #c8e6c9;
+}
+.nightMode .control-btn.active:hover {
+    background: #050505;
+}
+
+
+.control-select {
+    margin: 0px !important;
+    padding: 0px 2px !important;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    font-size: 16px !important;
+    appearance: auto;
+    transition: border-color 0.2s ease;    
+    padding-left: 0px;
+    padding-right: 0px;  
+    user-select: none !important;     
+}
+.nightMode .control-select {
+    background: black;
+}
+
+.control-select option {
+    user-select: none !important;    
+}
+
+
+.control-select:hover {    
+    background: #eeeeee;
+}
+.nightMode .control-select:hover {    
+    background: #111111;
+}
+
+.control-select:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);    
+}
+
+
+@media (max-width: 600px) {
+    .tts-controls {
+        justify-content: center;
+        padding: 8px 10px;
+        left: 0px;
+        right: 0px;
+    }
+    
+    .controls-row {
+        gap: 6px;
+    }
+    
+    .control-btn {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+    
+    /* .control-select {
+        padding: 5px 25px 5px 8px;
+        font-size: 12px;
+        min-width: 65px;
+    } */
+}
+
+
+.editable {
+    display: inline-block;
+    min-width: 50px;
+    text-indent: 0px !important;        
+    font-family: arial !important;
+    font-size: 20px !important;
+    font-weight: bold !important;
+    letter-spacing: 0.6px !important;
+    border: 1px solid gray;    
+    padding: 0px 5px;
+    white-space: pre;
+    margin: auto;   
+    border-top-width: 0px;        
+    border-bottom-width: 0px;    
+    text-wrap: wrap;
+}
+
+.clozehint {
+    color: gray;
+}
+
+.goodInput {
+    color: green;    
+}
+.ErrorInput {
+    color: red;    
+}
+.colorInput {
+    color: black;    
+}
+.nightMode .colorInput {
+    color: #00aeff;    
+}
+
+
+.btnClear {
+    margin: 5px !important;
+    padding: 0px 5px !important;
+    border: 1px solid #ccc;
+    border-radius: 5px !important;
+    color: black !important;
+    background: white !important;
+    cursor: pointer;
+    font-size: 13px !important;
+    vertical-align: bottom;
+    /* transition: all 0.2s ease; */
+    white-space: nowrap;
+    user-select: none;
+}
+.nightMode .btnClear {
+    background: black !important; 
+    color: white !important;      
+}
+
+.btnClear:focus { 
+    border: 1.5px solid #4CAF50;  
+}
+
+.tts-sound-all {
+    cursor: pointer;    
+}
+
+.visibleIMP {
+    display: inline-block;
+}
+
+.hiddenIMP {
+    display: none;    
+}
+
+#note-section, #mnemonics-section, #extra-section, #info-section  {
+    opacity: 0.3;    
+}
+.back #note-section, .back #mnemonics-section, .back #extra-section, .back #info-section  {
+    opacity: 1;    
+}
+
+
+span .suggested {
+    letter-spacing: 0.6px;    
+}
+
+.goodInput:focus {
+    outline-color: green !important;
+    outline-width: 1.5px;
+    outline-style: solid;
+}
+
+#f_header {
+    text-align: center;
+    color: gray !important;
+}
+
+#f_header a {
+    text-decoration: none;  
+    color: gray !important;  
+}
+
+
+.custom-select {
+    position: relative;
+    display: inline-block;
+    min-width: 70px;
+    user-select: none;
+}
+
+.custom-select-display {
+    padding: 0px 2px;
+    margin: 0px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+    /* background: black; */
+    position: relative;    
+    /* min-height: 28px;
+    line-height: 28px; */
+    font-size: 15px;     
+}
+
+.custom-select-display::after {
+    content: '▼';
+    position: absolute;
+    right: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    color: #666;
+}
+
+.custom-select-options {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    /* background: white; */
+    border: 1px solid #ccc;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;    
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 9999999;
+    display: none;
+    margin-bottom: -2px;        
+}
+
+.custom-select-options.open {
+    display: block !important;    
+    background: white; !important; 
+}
+.nightMode .custom-select-options.open {
+    background: black; !important; 
+} 
+
+.custom-option {
+    padding: 3px 10px;
+    cursor: pointer;
+    font-size: 14px;    
+}
+
+.custom-option:hover {
+    background: #c0c0c0;
+}
+.nightMode .custom-option:hover {
+    background: #666666;
+} 
+
+.custom-option[data-selected="true"] {
+    background: #a0a0a0; 
+    font-weight: bold;
+}
+.nightMode .custom-option[data-selected="true"] {
+    background: #333333; 
+    font-weight: bold;
+}

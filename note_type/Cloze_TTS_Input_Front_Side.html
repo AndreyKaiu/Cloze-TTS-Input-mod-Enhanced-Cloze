@@ -1,0 +1,1890 @@
+<!-- VERSION 1.14 mod kaiu -->
+<script>
+var scrollToClozeOnToggle=true
+var animateScroll=true
+var showHintsForPseudoClozes=true
+var underlineRevealedPseudoClozes=true
+var underlineRevealedGenuineClozes=true
+var revealPseudoClozesByDefault=false
+var revealNextGenuineClozeShortcut="Ctrl+J"
+var revealAllGenuineClozesShortcut="Ctrl+Shift+J"
+var revealNextPseudoClozeShortcut="Ctrl+N"
+var revealAllPseudoClozesShortcut="Ctrl+Shift+N"
+var swapLeftAndRightBorderActions=false
+var googleTranslateIntoLanguage="en"
+var ttsSoundEnable=true
+var inputEnable=false
+var floatingPanelEnable=true
+</script>
+<!-- CONFIG END -->
+
+<!-- ADDITIONAL CONFIG -->
+<script> 
+// Below, specify different names if you have many types of notes.
+var STORAGE_KEY = 'anki_Cloze_TTS_Input';
+var aiUserLanguage="My native language (country or language code): %PARLNG%"
+var aiUserLearningLanguage="I'm learning a foreign language (country or language code): %PARLNG%"
+var aiTask1 = "You will be given a text in a foreign language and will need to translate it into my native language. Your answer must be in my native language."
+var aiTranslated = "Text to be translated: %PARTXT%"
+var aiTask2="\nRepeat this text in your answer on a separate line.\nGive the translation of this text on a separate line below.\nIf the text is short, no more than 3 words, then give an example of usage on another separate line (preferably a simple, non-complex sentence).\nOn the line below, give a translation of the example indicated on the line above.\nOn another line below, describe what rules are in this text; perhaps you can tell us some specific features about this text so that it would be useful for those who are just beginning to learn this foreign language.\nWhen you give an answer, you don't need any additional words, like this is a translation, and this is an example, except for the last line where you describe the rules, where you can use different words for clarification."
+</script>
+
+{{#Header}}<div id="f_header">{{#HeaderURL_filepdf#page=}}<a href="{{text:HeaderURL_filepdf#page=}}" target="_blank">{{/HeaderURL_filepdf#page=}}{{Header}}{{#HeaderURL_filepdf#page=}}<span id="pagePdf"></span></a>{{/HeaderURL_filepdf#page=}}</div>{{/Header}}
+<div class="tts-controls" onclick="event.stopPropagation();">
+    <div class="controls-row">
+        
+        
+        <div class="custom-select" id="langSelectCustom">
+            <div class="custom-select-display" id="langDisplay" data-value="en-US">US</div>
+            <div class="custom-select-options" id="langOptions" style="display:none;">
+                <div class="custom-option" data-value="ar-SA">AR</div>
+                <div class="custom-option" data-value="bg-BG">BG</div>
+                <div class="custom-option" data-value="pt-BR">BR</div>
+                <div class="custom-option" data-value="zh-CN">CN</div>
+                <div class="custom-option" data-value="de-DE">DE</div>
+                <div class="custom-option" data-value="es-ES">ES</div>
+                <div class="custom-option" data-value="fr-FR">FR</div>
+                <div class="custom-option" data-value="en-GB">GB</div>
+                <div class="custom-option" data-value="it-IT">IT</div>
+                <div class="custom-option" data-value="ja-JP">JP</div>
+                <div class="custom-option" data-value="ko-KR">KR</div>
+                <div class="custom-option" data-value="pl-PL">PL</div>
+                <div class="custom-option" data-value="pt-PT">PT</div>
+                <div class="custom-option" data-value="ro-RO">RO</div>
+                <div class="custom-option" data-value="ru-RU">RU</div>
+                <div class="custom-option" data-value="tr-TR">TR</div>
+                <div class="custom-option" data-value="uk-UA">UK</div>
+                <div class="custom-option" data-value="en-US" data-selected="true">US</div>
+            </div>
+        </div>
+        
+        
+        <div class="custom-select" id="speedSelectCustom">
+            <div class="custom-select-display" id="speedDisplay" data-value="1.0">1.0</div>
+            <div class="custom-select-options" id="speedOptions" style="display:none;">
+                <div class="custom-option" data-value="0.1">0.1</div>
+                <div class="custom-option" data-value="0.2">0.2</div>
+                <div class="custom-option" data-value="0.3">0.3</div>
+                <div class="custom-option" data-value="0.4">0.4</div>
+                <div class="custom-option" data-value="0.5">0.5</div>
+                <div class="custom-option" data-value="0.6">0.6</div>
+                <div class="custom-option" data-value="0.7">0.7</div>
+                <div class="custom-option" data-value="0.8">0.8</div>
+                <div class="custom-option" data-value="1.0" data-selected="true">1.0</div>
+                <div class="custom-option" data-value="1.25">1.25</div>
+                <div class="custom-option" data-value="1.5">1.5</div>
+                <div class="custom-option" data-value="1.75">1.75</div>
+                <div class="custom-option" data-value="2.0">2.0</div>
+                <div class="custom-option" data-value="2.5">2.5</div>
+                <div class="custom-option" data-value="3.0">3.0</div>
+            </div>
+        </div>
+        
+        <button class="tts-sound-all" onclick="ttssoundall();">🔊</button>
+        <button class="tts-sound-all" onclick="stopSpeak();">⏹</button>
+        
+        
+        <!-- Button Sound -->        
+        <button id="soundBtn" class="control-btn">TTS Sound</button>
+       
+        <button onclick="ClearHTMLAllClass('clozeinput')" class="control-btn btnClearAll" title="Clear all input fields" style="border-radius: 7px;">CLR ALL</button>
+
+        <!-- Button Input (Mode Switching) -->
+        <button id="inputBtn" class="control-btn">⌨️ Input</button>
+        
+        <button id="hideAllBtn" class="control-btn">Hide all</button>        
+        
+    </div>
+</div>
+
+<div id="card-body">
+    
+
+    
+    <div id="main-section" class="content">
+        <!-- this element will contain the actual content - the enhanced clozes -->
+        <!-- <button class="tts-sound-all" onclick="ttssoundall();">🔊</button> -->
+        <span id="enhanced-clozes"></span>
+    
+    <!-- Button block (initially hidden) -->
+    <div id="floating-toolbar" class="floating-toolbar">
+        <button class="toolbar-btn tts-sound-float" onclick="ttssoundall();" title="TTS text-to-speech">🔊</button>
+        <button class="toolbar-btn copy-float" onclick="copySelected();" title="Copy">📋</button>
+        <button class="toolbar-btn translate-float" onclick="translateSelected();" title="Translate">🌐</button>
+        <button class="toolbar-btn findgoogle-float" onclick="findGoogleSelected();" title="Google">🔍</button>
+        <button class="toolbar-btn aigoogle-float" onclick="askAIGoogleSelected();" title="AI Google">🤖</button>
+        <button class="toolbar-btn close-float" onclick="hideToolbar();" title="Close">✕</button>
+    </div>
+    
+    </div>
+        
+    <p style="border-bottom: 1px; border-style:solid; line-height: 1; border-color: gray;"></p>    
+    <p class="" style="margin: 5.5px;"></p>
+    <div>
+        {{#Note}}
+        <div id="note-section">
+            <div id="note-header" class="header header-red" onclick="showNextElement(this)">
+                Note
+            </div>
+            <div id="note" class="content" style="display:none">
+                {{edit:Note}}
+            </div>
+        </div>
+        <br>
+        <p class="" style="margin: 5.5px;"></p>
+        {{/Note}}
+
+        {{#Mnemonics}}
+        <div id="mnemonics-section">
+            <div id="mnemonics-header" class="header header-green" onclick="showNextElement(this)">
+                Mnemonics
+            </div>
+            <div id="mnemonics" class="content" style="display:none">
+                {{edit:Mnemonics}}
+            </div>
+        </div>
+        <br>
+        <p class="" style="margin: 5.5px;"></p>
+        {{/Mnemonics}}
+
+
+        {{#Extra}}
+        <div id="extra-section">
+            <div id="extra-header" class="header header-yellow" onclick="showNextElement(this)">
+                Extra
+            </div>
+            <div id="extra" class="content" style="display:none">
+                {{edit:Extra}}
+            </div>
+        </div>
+        <br>
+        <p class="" style="margin: 5.5px;"></p>
+        {{/Extra}}
+
+
+        <div id="info-section">
+            <div id="info-header" class="header header-blue" onclick="showNextElement(this)">
+                Information
+            </div>
+
+            <div id="info" class="content" style="display:none">
+                <div>
+                    <b style="font-size: 0.9rem;">Deck</b>: <i>{{Deck}}</i>
+                </div>
+               
+                {{#Tags}}
+                <div id="tags">
+                    <b style="font-size: 0.9rem;">Tags</b>: <i>{{Tags}}</i>
+                </div>
+                {{/Tags}}
+            </div>
+        </div>
+        <br>
+
+        <div id="functional-elements">
+            <div id="show-one-cloze-left"></div>
+            <div id="show-one-cloze-right"></div>
+            <div id="no-more-cloze"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ENHANCED_CLOZE -->
+<span id="enhanced-cloze-content" style="display:none">{{Content}}</span>
+<span style="display:none;" id="edit-clozes">{{edit:cloze:Content}}</span>
+
+<!-- prevent Anki from complaining about clozes not being used as clozes -->
+<span style="display:none">{{cloze:Content}}</span>
+
+<!-- fix no-cloze-basic-mode cards on AnkiDroid, without this AnkiDroid says that clozes are missing -->
+<span style="display:none">{{cloze:Cloze99}}</span>
+
+
+<script> 
+// This is for an ankydroid, since it loses select 
+
+(function() {
+    const speedDisplay = document.getElementById('speedDisplay');
+    const speedOptions = document.getElementById('speedOptions');
+    const speedCO = speedOptions.querySelectorAll('.custom-option');
+    let speedIsOpen = false;
+    const langDisplay = document.getElementById('langDisplay');
+    const langOptions = document.getElementById('langOptions');
+    const langCO = langOptions.querySelectorAll('.custom-option');
+    let langIsOpen = false;
+
+    speedDisplay.addEventListener('click', function(e) {
+        e.stopPropagation();
+        speedIsOpen = !speedIsOpen;
+        speedOptions.classList.toggle('open', speedIsOpen);
+    });
+    
+    langDisplay.addEventListener('click', function(e) {
+        e.stopPropagation();
+        langIsOpen = !langIsOpen;
+        langOptions.classList.toggle('open', langIsOpen);
+    });
+    
+    
+    langCO.forEach(opt => {
+        opt.addEventListener('click', function(e) {
+            e.stopPropagation();
+            let value = this.dataset.value;
+            let text = this.textContent;
+
+            langDisplay.textContent = text;
+
+            langCO.forEach(o => o.dataset.selected = 'false');
+            this.dataset.selected = 'true';
+
+            langOptions.classList.remove('open');
+            langIsOpen = false;
+
+            let event = new Event('change');
+            this.dispatchEvent(event);
+            
+            let settings = window.getSettingsFromUI();
+            settings.language = value;
+            langDisplay.dataset.value = String(value); 
+            window.saveSettings(settings);
+        });
+    });
+
+    speedCO.forEach(opt => {
+        opt.addEventListener('click', function(e) {
+            e.stopPropagation();
+            let value = this.dataset.value;
+            let text = this.textContent;
+
+            speedDisplay.textContent = text;
+
+            speedCO.forEach(o => o.dataset.selected = 'false');
+            this.dataset.selected = 'true';
+
+            speedOptions.classList.remove('open');
+            speedIsOpen = false;
+
+            let event = new Event('change');
+            this.dispatchEvent(event);
+            
+            let settings = window.getSettingsFromUI();
+            settings.speed = value;
+            speedDisplay.dataset.value = String(value);
+            window.saveSettings(settings);
+        });
+    });
+    
+        
+    document.addEventListener('click', function() {
+        langOptions.classList.remove('open');
+        langIsOpen = false;
+        speedOptions.classList.remove('open');
+        speedIsOpen = false;
+    });
+    
+   
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && (langIsOpen || speedIsOpen)) {
+            langOptions.classList.remove('open');
+            langIsOpen = false;
+            speedOptions.classList.remove('open');
+            speedIsOpen = false;
+        }
+    });
+    
+        
+    window.setCustomSelectValueLang = function (value) {
+        let found = false;
+        langCO.forEach(opt => {
+            if (opt.dataset.value === String(value)) {                
+                opt.dataset.selected = 'true';
+                langDisplay.textContent = opt.textContent;
+                langDisplay.dataset.value = String(value);
+                found = true;
+            } else {
+                opt.dataset.selected = 'false';
+            }
+        });        
+    }
+    
+    window.setCustomSelectValueSpeed = function (value) {
+        let found = false;
+        speedCO.forEach(opt => {
+            if (opt.dataset.value === String(value)) {                
+                opt.dataset.selected = 'true';
+                speedDisplay.dataset.value = String(value);
+                speedDisplay.textContent = opt.textContent;
+                found = true;
+            } else {
+                opt.dataset.selected = 'false';
+            }
+        });        
+    }    
+    
+    
+})();
+</script>
+
+
+
+<script>
+var apiAnkiDroid;
+if (typeof AnkiDroidJS !== 'undefined') {
+    jsApiContract = { "version": "0.0.3", "developer": "infinyte01@mail.com" };
+    apiAnkiDroid = new AnkiDroidJS(jsApiContract);
+    apiAnkiDroid.ankiTtsSetLanguage('en-US');
+}
+
+var f_header = document.getElementById("f_header"); 
+if(f_header) {
+    document.title = f_header.textContent;
+}
+
+function headerURLSetPage() {
+    let pagePdf = document.getElementById('pagePdf');
+    if(pagePdf) {
+        let pageN = '{{text:HeaderURL_filepdf#page=}}';
+        pageN = pageN.trim();
+        pageN = pageN.split('#page=')[1];        
+        if(pageN && pageN.length > 0) {
+            if(pageN.length < 4)
+                pagePdf.innerText = ' - [' + '0'.repeat(4-pageN.length) + pageN + ']';
+            else 
+                pagePdf.innerText = ' - [' + pageN + ']';
+        }
+    }        
+}   
+headerURLSetPage(); 
+
+
+// ========================================
+// Managing settings via LocalStorage
+// ========================================
+
+(function() {
+    // Key for LocalStorage
+    //const STORAGE_KEY = 'anki_Enhanced_Cloze_TTS';
+
+    const DEFAULT_SETTINGS = {        
+        inputMode: inputEnable,
+        soundEnabled: ttsSoundEnable,
+        speed: '1.0',
+        language: 'en-US'        
+    };
+
+    const soundBtn = document.getElementById('soundBtn');
+    const inputBtn = document.getElementById('inputBtn');    
+    const speedSelectCustom = document.getElementById('speedSelectCustom');
+    const langSelectCustom = document.getElementById('langSelectCustom');   
+    const hideAllBtn = document.getElementById('hideAllBtn');
+    
+    
+    // ========================================
+    // Loading settings from LocalStorage
+    // ========================================
+    
+    window.loadSettings = function () {
+        let settings;
+        try {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                settings = JSON.parse(stored);
+                // Merge with default settings (in case some keys are missing)
+                settings = { ...DEFAULT_SETTINGS, ...settings };
+            } else {
+                settings = { ...DEFAULT_SETTINGS };
+            }
+        } catch (e) {
+            console.error('Error loading settings:', e);
+            settings = { ...DEFAULT_SETTINGS };
+        }
+        return settings;
+    }
+    
+    // ========================================
+    // Saving settings to LocalStorage
+    // ========================================
+    
+    window.saveSettings = function (settings) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+        } catch (e) {
+            console.error('Error saving settings:', e);
+        }
+    }
+    
+    // ========================================
+    // Applying settings to the interface
+    // ========================================
+    
+    window.applySettings = function (settings) {
+        let elClAll = document.getElementsByClassName('btnClearAll')[0];
+        let langSelectCustom = document.getElementById('langSelectCustom');
+        let speedSelectCustom = document.getElementById('speedSelectCustom');
+        
+        // Button Input
+        if (settings.inputMode) {
+            inputBtn.classList.add('active');
+            inputBtn.textContent = '⌨️ Input ON';
+            if(elClAll) {
+                elClAll.style.display = "";    
+            }
+        } else {
+            inputBtn.classList.remove('active');
+            inputBtn.textContent = '⌨️ Input OFF';
+            if(elClAll) {
+                elClAll.style.display = "none";    
+            }
+        }
+        
+        // Button Sound
+        if (settings.soundEnabled) {
+            soundBtn.classList.add('active');
+            soundBtn.textContent = 'TTS Sound';
+            if(langSelectCustom) langSelectCustom.style.display = "";
+            if(speedSelectCustom) speedSelectCustom.style.display = "";
+        } else {
+            soundBtn.classList.remove('active');
+            soundBtn.textContent = '🔇 TTS Sound';
+            if(langSelectCustom) langSelectCustom.style.display = "none";
+            if(speedSelectCustom) speedSelectCustom.style.display = "none";  
+        }
+              
+        
+        let elsTTS = document.querySelectorAll('.tts-sound-all');        
+        elsTTS.forEach(el => {
+            if(settings.soundEnabled){
+                el.style.display = "";                                
+            }
+            else {
+                el.style.display = "none";                              
+            }
+        });
+        
+        // Speed        
+        setCustomSelectValueSpeed(settings.speed);
+        
+        // Language
+        setCustomSelectValueLang(settings.language);        
+    }
+    
+    // ========================================
+    // Getting current settings from the interface
+    // ========================================
+    
+    window.getSettingsFromUI = function() {
+        return {
+            inputMode: inputBtn.classList.contains('active'),
+            soundEnabled: soundBtn.classList.contains('active'),            
+            speed: speedDisplay.dataset.value,
+            language: langDisplay.dataset.value
+        };
+    }
+    
+    // ========================================
+    // Event handlers
+    // ========================================
+    
+    // for Input
+    inputBtn.addEventListener('click', function() {
+        const settings = window.getSettingsFromUI();
+        settings.inputMode = !settings.inputMode;
+        applySettings(settings);
+        saveSettings(settings);
+         
+        let elClAll = document.getElementsByClassName('btnClearAll')[0];
+                
+        if (settings.inputMode) {            
+            document.querySelectorAll('.hiddenIMP').forEach(el => {
+                el.classList.remove('hiddenIMP');
+                el.classList.add('visibleIMP');
+            });
+            if(elClAll) {
+                elClAll.style.display = "";    
+            }
+            //console.log('⌨️ Input mode ON');
+        } else {            
+            document.querySelectorAll('.visibleIMP').forEach(el => {
+                el.classList.remove('visibleIMP');
+                el.classList.add('hiddenIMP');
+            });
+            if(elClAll) {
+                elClAll.style.display = "none";    
+            }
+            //console.log('⌨️ Input mode OFF');
+        }        
+       
+    });
+    
+    
+    // for Sound
+    soundBtn.addEventListener('click', function() {
+        const settings = window.getSettingsFromUI();        
+        if(settings.soundEnabled) {
+            speakText("", ""); // stop    
+        }
+        settings.soundEnabled = !settings.soundEnabled;
+        applySettings(settings);
+        saveSettings(settings);
+        
+        let langSelectCustom = document.getElementById('langSelectCustom');
+        let speedSelectCustom = document.getElementById('speedSelectCustom');   
+    
+        let elsTTS = document.querySelectorAll('.tts-sound-all, .tts-sound-float, #langSelectCustom, #speedSelectCustom');        
+        elsTTS.forEach(el => {
+            if(settings.soundEnabled){
+                el.style.display = "";                                
+            }
+            else {
+                el.style.display = "none";                              
+            }
+        });
+       
+                    
+        
+    });
+       
+    
+    
+    
+    // for Hide All
+    hideAllBtn.addEventListener('click', function() {
+        toggleAllClozesOfAType("genuine", true);
+        toggleAllClozesOfAType("pseudo", true);        
+    }); 
+        
+    
+    // ========================================
+    // Initialization on startup
+    // ========================================
+    
+    // Loading and applying settings
+    const savedSettings = loadSettings();
+    applySettings(savedSettings);
+    
+    //console.log('✅ Settings loaded:', savedSettings);
+    //console.log('📦 Stored in localStorage key:', STORAGE_KEY);
+    
+    // ========================================
+    // Additional functions for use in other scripts
+    // ========================================
+    
+    // Function for retrieving current settings from LocalStorage
+    window.getTTSSettings = function() {
+        return loadSettings();
+    };
+    
+    // Function for updating settings from outside
+    window.updateTTSSettings = function(newSettings) {
+        const current = loadSettings();
+        const updated = { ...current, ...newSettings };
+        saveSettings(updated);
+        applySettings(updated);
+        return updated;
+    };
+    
+    // Function for resetting settings
+    window.resetTTSSettings = function() {
+        saveSettings(DEFAULT_SETTINGS);
+        applySettings(DEFAULT_SETTINGS);
+        //console.log('🔄 Settings reset to default');
+        return DEFAULT_SETTINGS;
+    };
+    
+    
+})();
+</script>
+
+
+
+<script>
+
+// ============================================================
+//  CONTROLLING A FLOATING BLOCK WITH BUTTONS
+// ============================================================
+
+(function() {
+    const toolbar = document.getElementById('floating-toolbar');
+    if (!toolbar || !floatingPanelEnable) return;
+    
+    
+    let hideTimeout = null;
+    let isToolbarVisible = false;
+    
+    // ---------- 1. Showing the toolbar when selected ----------
+    document.addEventListener('selectionchange', function(event) {
+        if (!toolbar || !floatingPanelEnable) return;
+        const selection = window.getSelection();
+        const selectedText = selection ? selection.toString().trim() : '';
+                
+        // If there is a selection AND voiceover is enabled
+        if (selectedText.length > 0) {
+            // Get the selection position
+            const range = selection.getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+            
+            // ============================================================
+            // DETERMINING WHERE TO SHOW THE PANEL: TOP OR BOTTOM
+            // ============================================================
+            
+            const windowHeight = window.innerHeight;
+            const windowWidth = window.innerWidth;
+            const rectBottom = rect.bottom;
+            const rectTop = rect.top;
+            
+            const percentageFromTop = (rectTop / windowHeight) * 100;
+            
+            // Panel size (approximately)
+            const toolbarHeight = 50;
+            const toolbarWidth = 250;
+            
+            let topPosition;
+            let isAbove = false;            
+
+            if (percentageFromTop > 70 || (windowHeight - rectBottom) < 80) {                
+                topPosition = rectTop - toolbarHeight - 17;
+                isAbove = true;
+            } else {                
+                topPosition = rectBottom + 27;
+                isAbove = false;
+            }
+            
+            // Vertical adjustment
+            if (topPosition < 10) {
+                topPosition = 10;
+            }
+            if (topPosition + toolbarHeight > windowHeight - 10) {
+                topPosition = windowHeight - toolbarHeight - 10;
+            }
+            
+            // Horizontal adjustment            
+            let leftPosition = rect.left;
+            if (leftPosition + toolbarWidth > windowWidth - 10) {                
+                leftPosition = windowWidth - toolbarWidth - 10;                
+            }
+           
+            if (leftPosition < 10) {
+                leftPosition = 10;
+            }
+            
+            toolbar.style.left = leftPosition + 'px';
+            toolbar.style.top = topPosition + 'px';
+            
+            toolbar.classList.remove('show-from-top', 'show-from-bottom');
+            if (isAbove) {
+                toolbar.classList.add('show-from-top');
+            } else {
+                toolbar.classList.add('show-from-bottom');
+            }
+            
+            toolbar.classList.add('show');
+            toolbar.style.display = 'flex';
+            isToolbarVisible = true;
+            
+            // Cancel the previous timer
+            if (hideTimeout) {
+                clearTimeout(hideTimeout);
+            }
+            
+            // Hide after 3 seconds
+            hideTimeout = setTimeout(function() {
+                hideToolbar();
+            }, 3000);
+        } else {
+            hideToolbar();
+        }
+    });
+    
+    // ---------- 2. Hide the toolbar ----------
+    window.hideToolbar = function() {
+        if (hideTimeout) {
+            clearTimeout(hideTimeout);
+            hideTimeout = null;
+        }
+        toolbar.classList.remove('show');
+        toolbar.style.display = 'none';
+        isToolbarVisible = false;
+    };
+    
+    // ---------- 3. Clicking any button cancels hiding ----------
+    toolbar.addEventListener('click', function(event) {
+        if (!toolbar || !floatingPanelEnable) return;
+        if (event.target.closest('.toolbar-btn')) {
+            if (hideTimeout) {
+                clearTimeout(hideTimeout);
+                hideTimeout = null;
+            }
+        }
+    });
+    
+    // ---------- 4. Unhide if the cursor was over the panel ----------
+    toolbar.addEventListener('mouseenter', function() {  
+        if (!toolbar || !floatingPanelEnable) return;     
+        if (hideTimeout) {
+            clearTimeout(hideTimeout);
+            hideTimeout = null;
+        }
+    });
+    
+    // ---------- 5. Hide when clicking outside the toolbar ----------
+    document.addEventListener('mousedown', function(event) {
+        if (!toolbar || !floatingPanelEnable) return;
+        if (isToolbarVisible) {
+            const target = event.target;
+            if (!toolbar.contains(target) && !target.closest('.toolbar-btn')) {
+                setTimeout(() => {
+                    if (!toolbar.contains(document.activeElement)) {
+                        hideToolbar();
+                    }
+                }, 50);
+            }
+        }
+    });
+    
+    // ---------- 6. Close with Escape ----------
+    document.addEventListener('keydown', function(event) {
+        if (!toolbar || !floatingPanelEnable) return;
+        if (event.key === 'Escape' && isToolbarVisible) {
+            hideToolbar();
+        }
+    });
+    
+    // ---------- 7. Button Functions ----------
+    window.translateSelected = function() {
+        const selection = window.getSelection();
+        const text = selection ? selection.toString().trim() : '';
+        if (text) {
+            window.open(`https://translate.google.com/?sl=auto&tl=${googleTranslateIntoLanguage}&text=${encodeURIComponent(text)}`, '_blank');
+        }
+    };
+    
+    
+    /* ---- COPY ---- */
+    // Copy to clipboard for older browsers
+    function fallbackCopyToClipboard(text) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed"; // To prevent page scrolling
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();    
+      try {
+        document.execCommand('copy');    
+      } catch (err) {
+        console.error('Clipboard write error: ', err);
+      }  
+      document.body.removeChild(textArea);
+    }
+    
+    // The main function of copying to the clipboard
+    async function copyToClipboard(text) {    
+        if (typeof pycmd !== "undefined") {
+            try {
+                // An alternative method for older browsers           
+                fallbackCopyToClipboard(text);            
+            } catch(e) {
+                await navigator.clipboard.writeText(text);            
+            }   
+        }
+        else {
+            try {
+                await navigator.clipboard.writeText(text);
+            } catch(e) {
+                // An alternative method for older browsers           
+                fallbackCopyToClipboard(text);
+            }        
+        }        
+    }
+    /* ^^^^ COPY ^^^^ */
+    
+    
+    window.copySelected = function() {
+        const selection = window.getSelection();
+        const text = selection ? selection.toString().trim() : '';
+        if (text) {
+            copyToClipboard(text);
+        }
+    };
+    
+    
+    function OpenAI(txt, lng) {
+        // Checking required variables
+        if (typeof aiUserLanguage === 'undefined' || typeof aiUserLearningLanguage === 'undefined') {
+            console.error('AI variables are not defined');
+            return;
+        }
+
+        let safeTxt = txt || '';
+        let safeLng = lng || 'English';
+
+        const MAX_TEXT_LENGTH = 500;
+        if (safeTxt.length > MAX_TEXT_LENGTH) {
+            safeTxt = safeTxt.substring(0, MAX_TEXT_LENGTH) + '...';
+        }
+
+        let prompt = aiUserLanguage.replace('%PARLNG%', googleTranslateIntoLanguage) 
+            + "\n" + aiUserLearningLanguage.replace('%PARLNG%', safeLng)
+            + "\n" + (aiTask1 || '')
+            + "\n" + aiTranslated.replace('%PARTXT%', safeTxt)
+            + "\n" + (aiTask2 || '');
+
+        const query = encodeURIComponent(prompt);
+        let searchURL = "https://www.google.com/search?q=" + query + "&udm=50";
+        
+        window.open(searchURL, "_blank");
+    }
+    
+    window.askAIGoogleSelected = function() {
+        const selection = window.getSelection();
+        const text = selection ? selection.toString().trim() : '';
+        if (text) {
+            var st = window.getSettingsFromUI();
+            OpenAI(text, st.language);            
+        }
+    };
+    
+    
+    window.findGoogleSelected = function() {
+        const selection = window.getSelection();
+        const text = selection ? selection.toString().trim() : '';
+        if (text) {            
+            const query = encodeURIComponent(text);                
+            let searchURL = "https://www.google.com/search?q=" + query;        
+            window.open(searchURL, "_blank");
+        }
+    };
+    
+
+})();
+
+</script>
+
+
+<script>
+
+
+</script>
+
+<script>
+    var enhancedClozesData = {
+        "clozeId": [],
+        "answers": [],
+        "hints": [],
+    }
+
+    async function enhancedClozesMain() {
+
+        // Regex for clozes
+        // the extra (?:) at the beginning is there so that Anki doesn't think this is a field
+        const clozeRegex = /{(?:){c(\d+)::([\W\w]*?)(?:::([\W\w]*?))?}}/g
+
+        var ctrlDown = false;
+
+        await maybeInjectJquery()
+        defineEnhancedClozeAddEventListener()
+        setupKeyListenerForCtrlKey()
+        prepareEnhancedClozesData()
+        prepareEnhancedClozesHTML()
+        maybeScrollToFirstGenuineCloze()
+        setupClozeEvents()
+        setupEditFieldDuringReview()
+        insertStyling()
+
+        function prepareEnhancedClozesData() {
+            var content = document.getElementById("enhanced-cloze-content").innerHTML
+            var match = clozeRegex.exec(content);
+            while (match != null) {
+                enhancedClozesData["clozeId"].push(match[1])
+                enhancedClozesData["answers"].push(match[2])
+                enhancedClozesData["hints"].push(match[3] !== undefined ? match[3] : "")
+                match = clozeRegex.exec(content);
+            }
+        }
+
+        function prepareEnhancedClozesHTML() {
+            var ord =
+                `{{#c1}}1{{/c1}}{{#c2}}2{{/c2}}{{#c3}}3{{/c3}}{{#c4}}4{{/c4}}{{#c5}}5{{/c5}}{{#c6}}6{{/c6}}{{#c7}}7{{/c7}}{{#c8}}8{{/c8}}{{#c9}}9{{/c9}}{{#c10}}10{{/c10}}{{#c11}}11{{/c11}}{{#c12}}12{{/c12}}{{#c13}}13{{/c13}}{{#c14}}14{{/c14}}{{#c15}}15{{/c15}}{{#c16}}16{{/c16}}{{#c17}}17{{/c17}}{{#c18}}18{{/c18}}{{#c19}}19{{/c19}}{{#c20}}20{{/c20}}{{#c21}}21{{/c21}}{{#c22}}22{{/c22}}{{#c23}}23{{/c23}}{{#c24}}24{{/c24}}{{#c25}}25{{/c25}}{{#c26}}26{{/c26}}{{#c27}}27{{/c27}}{{#c28}}28{{/c28}}{{#c29}}29{{/c29}}{{#c30}}30{{/c30}}{{#c31}}31{{/c31}}{{#c32}}32{{/c32}}{{#c33}}33{{/c33}}{{#c34}}34{{/c34}}{{#c35}}35{{/c35}}{{#c36}}36{{/c36}}{{#c37}}37{{/c37}}{{#c38}}38{{/c38}}{{#c39}}39{{/c39}}{{#c40}}40{{/c40}}{{#c41}}41{{/c41}}{{#c42}}42{{/c42}}{{#c43}}43{{/c43}}{{#c44}}44{{/c44}}{{#c45}}45{{/c45}}{{#c46}}46{{/c46}}{{#c47}}47{{/c47}}{{#c48}}48{{/c48}}{{#c49}}49{{/c49}}{{#c50}}50{{/c50}}{{#c51}}51{{/c51}}{{#c52}}52{{/c52}}{{#c53}}53{{/c53}}{{#c54}}54{{/c54}}{{#c55}}55{{/c55}}{{#c56}}56{{/c56}}{{#c57}}57{{/c57}}{{#c58}}58{{/c58}}{{#c59}}59{{/c59}}{{#c60}}60{{/c60}}{{#c61}}61{{/c61}}{{#c62}}62{{/c62}}{{#c63}}63{{/c63}}{{#c64}}64{{/c64}}{{#c65}}65{{/c65}}{{#c66}}66{{/c66}}{{#c67}}67{{/c67}}{{#c68}}68{{/c68}}{{#c69}}69{{/c69}}{{#c70}}70{{/c70}}{{#c71}}71{{/c71}}{{#c72}}72{{/c72}}{{#c73}}73{{/c73}}{{#c74}}74{{/c74}}{{#c75}}75{{/c75}}{{#c76}}76{{/c76}}{{#c77}}77{{/c77}}{{#c78}}78{{/c78}}{{#c79}}79{{/c79}}{{#c80}}80{{/c80}}{{#c81}}81{{/c81}}{{#c82}}82{{/c82}}{{#c83}}83{{/c83}}{{#c84}}84{{/c84}}{{#c85}}85{{/c85}}{{#c86}}86{{/c86}}{{#c87}}87{{/c87}}{{#c88}}88{{/c88}}{{#c89}}89{{/c89}}{{#c90}}90{{/c90}}{{#c91}}91{{/c91}}{{#c92}}92{{/c92}}{{#c93}}93{{/c93}}{{#c94}}94{{/c94}}{{#c95}}95{{/c95}}{{#c96}}96{{/c96}}{{#c97}}97{{/c97}}{{#c98}}98{{/c98}}{{#c99}}99{{/c99}}{{#c100}}100{{/c100}}{{#c101}}101{{/c101}}{{#c102}}102{{/c102}}{{#c103}}103{{/c103}}{{#c104}}104{{/c104}}{{#c105}}105{{/c105}}{{#c106}}106{{/c106}}{{#c107}}107{{/c107}}{{#c108}}108{{/c108}}{{#c109}}109{{/c109}}{{#c110}}110{{/c110}}{{#c111}}111{{/c111}}{{#c112}}112{{/c112}}{{#c113}}113{{/c113}}{{#c114}}114{{/c114}}{{#c115}}115{{/c115}}{{#c116}}116{{/c116}}{{#c117}}117{{/c117}}{{#c118}}118{{/c118}}{{#c119}}119{{/c119}}{{#c120}}120{{/c120}}{{#c121}}121{{/c121}}{{#c122}}122{{/c122}}{{#c123}}123{{/c123}}{{#c124}}124{{/c124}}{{#c125}}125{{/c125}}{{#c126}}126{{/c126}}{{#c127}}127{{/c127}}{{#c128}}128{{/c128}}{{#c129}}129{{/c129}}{{#c130}}130{{/c130}}{{#c131}}131{{/c131}}{{#c132}}132{{/c132}}{{#c133}}133{{/c133}}{{#c134}}134{{/c134}}{{#c135}}135{{/c135}}{{#c136}}136{{/c136}}{{#c137}}137{{/c137}}{{#c138}}138{{/c138}}{{#c139}}139{{/c139}}{{#c140}}140{{/c140}}{{#c141}}141{{/c141}}{{#c142}}142{{/c142}}{{#c143}}143{{/c143}}{{#c144}}144{{/c144}}{{#c145}}145{{/c145}}{{#c146}}146{{/c146}}{{#c147}}147{{/c147}}{{#c148}}148{{/c148}}{{#c149}}149{{/c149}}{{#c150}}150{{/c150}}{{#c151}}151{{/c151}}{{#c152}}152{{/c152}}{{#c153}}153{{/c153}}{{#c154}}154{{/c154}}{{#c155}}155{{/c155}}{{#c156}}156{{/c156}}{{#c157}}157{{/c157}}{{#c158}}158{{/c158}}{{#c159}}159{{/c159}}{{#c160}}160{{/c160}}{{#c161}}161{{/c161}}{{#c162}}162{{/c162}}{{#c163}}163{{/c163}}{{#c164}}164{{/c164}}{{#c165}}165{{/c165}}{{#c166}}166{{/c166}}{{#c167}}167{{/c167}}{{#c168}}168{{/c168}}{{#c169}}169{{/c169}}{{#c170}}170{{/c170}}{{#c171}}171{{/c171}}{{#c172}}172{{/c172}}{{#c173}}173{{/c173}}{{#c174}}174{{/c174}}{{#c175}}175{{/c175}}{{#c176}}176{{/c176}}{{#c177}}177{{/c177}}{{#c178}}178{{/c178}}{{#c179}}179{{/c179}}{{#c180}}180{{/c180}}{{#c181}}181{{/c181}}{{#c182}}182{{/c182}}{{#c183}}183{{/c183}}{{#c184}}184{{/c184}}{{#c185}}185{{/c185}}{{#c186}}186{{/c186}}{{#c187}}187{{/c187}}{{#c188}}188{{/c188}}{{#c189}}189{{/c189}}{{#c190}}190{{/c190}}{{#c191}}191{{/c191}}{{#c192}}192{{/c192}}{{#c193}}193{{/c193}}{{#c194}}194{{/c194}}{{#c195}}195{{/c195}}{{#c196}}196{{/c196}}{{#c197}}197{{/c197}}{{#c198}}198{{/c198}}{{#c199}}199{{/c199}}{{#c200}}200{{/c200}}{{#c201}}201{{/c201}}{{#c202}}202{{/c202}}{{#c203}}203{{/c203}}{{#c204}}204{{/c204}}{{#c205}}205{{/c205}}{{#c206}}206{{/c206}}{{#c207}}207{{/c207}}{{#c208}}208{{/c208}}{{#c209}}209{{/c209}}{{#c210}}210{{/c210}}{{#c211}}211{{/c211}}{{#c212}}212{{/c212}}{{#c213}}213{{/c213}}{{#c214}}214{{/c214}}{{#c215}}215{{/c215}}{{#c216}}216{{/c216}}{{#c217}}217{{/c217}}{{#c218}}218{{/c218}}{{#c219}}219{{/c219}}{{#c220}}220{{/c220}}{{#c221}}221{{/c221}}{{#c222}}222{{/c222}}{{#c223}}223{{/c223}}{{#c224}}224{{/c224}}{{#c225}}225{{/c225}}{{#c226}}226{{/c226}}{{#c227}}227{{/c227}}{{#c228}}228{{/c228}}{{#c229}}229{{/c229}}{{#c230}}230{{/c230}}{{#c231}}231{{/c231}}{{#c232}}232{{/c232}}{{#c233}}233{{/c233}}{{#c234}}234{{/c234}}{{#c235}}235{{/c235}}{{#c236}}236{{/c236}}{{#c237}}237{{/c237}}{{#c238}}238{{/c238}}{{#c239}}239{{/c239}}{{#c240}}240{{/c240}}{{#c241}}241{{/c241}}{{#c242}}242{{/c242}}{{#c243}}243{{/c243}}{{#c244}}244{{/c244}}{{#c245}}245{{/c245}}{{#c246}}246{{/c246}}{{#c247}}247{{/c247}}{{#c248}}248{{/c248}}{{#c249}}249{{/c249}}{{#c250}}250{{/c250}}
+    {{#c251}}251{{/c251}}{{#c252}}252{{/c252}}{{#c253}}253{{/c253}}{{#c254}}254{{/c254}}{{#c255}}255{{/c255}}{{#c256}}256{{/c256}}{{#c257}}257{{/c257}}{{#c258}}258{{/c258}}{{#c259}}259{{/c259}}{{#c260}}260{{/c260}}{{#c261}}261{{/c261}}{{#c262}}262{{/c262}}{{#c263}}263{{/c263}}{{#c264}}264{{/c264}}{{#c265}}265{{/c265}}{{#c266}}266{{/c266}}{{#c267}}267{{/c267}}{{#c268}}268{{/c268}}{{#c269}}269{{/c269}}{{#c270}}270{{/c270}}{{#c271}}271{{/c271}}{{#c272}}272{{/c272}}{{#c273}}273{{/c273}}{{#c274}}274{{/c274}}{{#c275}}275{{/c275}}{{#c276}}276{{/c276}}{{#c277}}277{{/c277}}{{#c278}}278{{/c278}}{{#c279}}279{{/c279}}{{#c280}}280{{/c280}}{{#c281}}281{{/c281}}{{#c282}}282{{/c282}}{{#c283}}283{{/c283}}{{#c284}}284{{/c284}}{{#c285}}285{{/c285}}{{#c286}}286{{/c286}}{{#c287}}287{{/c287}}{{#c288}}288{{/c288}}{{#c289}}289{{/c289}}{{#c290}}290{{/c290}}{{#c291}}291{{/c291}}{{#c292}}292{{/c292}}{{#c293}}293{{/c293}}{{#c294}}294{{/c294}}{{#c295}}295{{/c295}}{{#c296}}296{{/c296}}{{#c297}}297{{/c297}}{{#c298}}298{{/c298}}{{#c299}}299{{/c299}}{{#c300}}300{{/c300}}{{#c301}}301{{/c301}}{{#c302}}302{{/c302}}{{#c303}}303{{/c303}}{{#c304}}304{{/c304}}{{#c305}}305{{/c305}}{{#c306}}306{{/c306}}{{#c307}}307{{/c307}}{{#c308}}308{{/c308}}{{#c309}}309{{/c309}}{{#c310}}310{{/c310}}{{#c311}}311{{/c311}}{{#c312}}312{{/c312}}{{#c313}}313{{/c313}}{{#c314}}314{{/c314}}{{#c315}}315{{/c315}}{{#c316}}316{{/c316}}{{#c317}}317{{/c317}}{{#c318}}318{{/c318}}{{#c319}}319{{/c319}}{{#c320}}320{{/c320}}{{#c321}}321{{/c321}}{{#c322}}322{{/c322}}{{#c323}}323{{/c323}}{{#c324}}324{{/c324}}{{#c325}}325{{/c325}}{{#c326}}326{{/c326}}{{#c327}}327{{/c327}}{{#c328}}328{{/c328}}{{#c329}}329{{/c329}}{{#c330}}330{{/c330}}{{#c331}}331{{/c331}}{{#c332}}332{{/c332}}{{#c333}}333{{/c333}}{{#c334}}334{{/c334}}{{#c335}}335{{/c335}}{{#c336}}336{{/c336}}{{#c337}}337{{/c337}}{{#c338}}338{{/c338}}{{#c339}}339{{/c339}}{{#c340}}340{{/c340}}{{#c341}}341{{/c341}}{{#c342}}342{{/c342}}{{#c343}}343{{/c343}}{{#c344}}344{{/c344}}{{#c345}}345{{/c345}}{{#c346}}346{{/c346}}{{#c347}}347{{/c347}}{{#c348}}348{{/c348}}{{#c349}}349{{/c349}}{{#c350}}350{{/c350}}{{#c351}}351{{/c351}}{{#c352}}352{{/c352}}{{#c353}}353{{/c353}}{{#c354}}354{{/c354}}{{#c355}}355{{/c355}}{{#c356}}356{{/c356}}{{#c357}}357{{/c357}}{{#c358}}358{{/c358}}{{#c359}}359{{/c359}}{{#c360}}360{{/c360}}{{#c361}}361{{/c361}}{{#c362}}362{{/c362}}{{#c363}}363{{/c363}}{{#c364}}364{{/c364}}{{#c365}}365{{/c365}}{{#c366}}366{{/c366}}{{#c367}}367{{/c367}}{{#c368}}368{{/c368}}{{#c369}}369{{/c369}}{{#c370}}370{{/c370}}{{#c371}}371{{/c371}}{{#c372}}372{{/c372}}{{#c373}}373{{/c373}}{{#c374}}374{{/c374}}{{#c375}}375{{/c375}}{{#c376}}376{{/c376}}{{#c377}}377{{/c377}}{{#c378}}378{{/c378}}{{#c379}}379{{/c379}}{{#c380}}380{{/c380}}{{#c381}}381{{/c381}}{{#c382}}382{{/c382}}{{#c383}}383{{/c383}}{{#c384}}384{{/c384}}{{#c385}}385{{/c385}}{{#c386}}386{{/c386}}{{#c387}}387{{/c387}}{{#c388}}388{{/c388}}{{#c389}}389{{/c389}}{{#c390}}390{{/c390}}{{#c391}}391{{/c391}}{{#c392}}392{{/c392}}{{#c393}}393{{/c393}}{{#c394}}394{{/c394}}{{#c395}}395{{/c395}}{{#c396}}396{{/c396}}{{#c397}}397{{/c397}}{{#c398}}398{{/c398}}{{#c399}}399{{/c399}}{{#c400}}400{{/c400}}{{#c401}}401{{/c401}}{{#c402}}402{{/c402}}{{#c403}}403{{/c403}}{{#c404}}404{{/c404}}{{#c405}}405{{/c405}}{{#c406}}406{{/c406}}{{#c407}}407{{/c407}}{{#c408}}408{{/c408}}{{#c409}}409{{/c409}}{{#c410}}410{{/c410}}{{#c411}}411{{/c411}}{{#c412}}412{{/c412}}{{#c413}}413{{/c413}}{{#c414}}414{{/c414}}{{#c415}}415{{/c415}}{{#c416}}416{{/c416}}{{#c417}}417{{/c417}}{{#c418}}418{{/c418}}{{#c419}}419{{/c419}}{{#c420}}420{{/c420}}{{#c421}}421{{/c421}}{{#c422}}422{{/c422}}{{#c423}}423{{/c423}}{{#c424}}424{{/c424}}{{#c425}}425{{/c425}}{{#c426}}426{{/c426}}{{#c427}}427{{/c427}}{{#c428}}428{{/c428}}{{#c429}}429{{/c429}}{{#c430}}430{{/c430}}{{#c431}}431{{/c431}}{{#c432}}432{{/c432}}{{#c433}}433{{/c433}}{{#c434}}434{{/c434}}{{#c435}}435{{/c435}}{{#c436}}436{{/c436}}{{#c437}}437{{/c437}}{{#c438}}438{{/c438}}{{#c439}}439{{/c439}}{{#c440}}440{{/c440}}{{#c441}}441{{/c441}}{{#c442}}442{{/c442}}{{#c443}}443{{/c443}}{{#c444}}444{{/c444}}{{#c445}}445{{/c445}}{{#c446}}446{{/c446}}{{#c447}}447{{/c447}}{{#c448}}448{{/c448}}{{#c449}}449{{/c449}}{{#c450}}450{{/c450}}{{#c451}}451{{/c451}}{{#c452}}452{{/c452}}{{#c453}}453{{/c453}}{{#c454}}454{{/c454}}{{#c455}}455{{/c455}}{{#c456}}456{{/c456}}{{#c457}}457{{/c457}}{{#c458}}458{{/c458}}{{#c459}}459{{/c459}}{{#c460}}460{{/c460}}{{#c461}}461{{/c461}}{{#c462}}462{{/c462}}{{#c463}}463{{/c463}}{{#c464}}464{{/c464}}{{#c465}}465{{/c465}}{{#c466}}466{{/c466}}{{#c467}}467{{/c467}}{{#c468}}468{{/c468}}{{#c469}}469{{/c469}}{{#c470}}470{{/c470}}{{#c471}}471{{/c471}}{{#c472}}472{{/c472}}{{#c473}}473{{/c473}}{{#c474}}474{{/c474}}{{#c475}}475{{/c475}}{{#c476}}476{{/c476}}{{#c477}}477{{/c477}}{{#c478}}478{{/c478}}{{#c479}}479{{/c479}}{{#c480}}480{{/c480}}{{#c481}}481{{/c481}}{{#c482}}482{{/c482}}{{#c483}}483{{/c483}}{{#c484}}484{{/c484}}{{#c485}}485{{/c485}}{{#c486}}486{{/c486}}{{#c487}}487{{/c487}}{{#c488}}488{{/c488}}{{#c489}}489{{/c489}}{{#c490}}490{{/c490}}{{#c491}}491{{/c491}}{{#c492}}492{{/c492}}{{#c493}}493{{/c493}}{{#c494}}494{{/c494}}{{#c495}}495{{/c495}}{{#c496}}496{{/c496}}{{#c497}}497{{/c497}}{{#c498}}498{{/c498}}{{#c499}}499{{/c499}}{{#c500}}500{{/c500}}`
+            ord = ord.trim()
+
+            // create html with enhanced-clozes and insert it into the enhanced-clozes element
+            var content = document.getElementById("enhanced-cloze-content").innerHTML
+            var html = ""
+            var ctr = 0
+            var prevLastIndex = 0
+            match = clozeRegex.exec(content);
+            while (match !== null) {
+                var startIdx = clozeRegex.lastIndex - match[0].length
+                html += content.slice(prevLastIndex, startIdx)
+
+                var clozeType = ord == enhancedClozesData["clozeId"][ctr] ? "genuine-cloze" : "pseudo-cloze"
+                html +=
+                    `<span class="${clozeType}" show-state="hint" cid="${enhancedClozesData["clozeId"][ctr]}" index="${ctr}">${enhancedClozesData["hints"][ctr]}</span>`
+
+                prevLastIndex = clozeRegex.lastIndex
+                match = clozeRegex.exec(content);
+                ctr += 1
+            }
+            html += content.slice(prevLastIndex)
+
+            var enhDiv = document.getElementById("enhanced-clozes")
+            enhDiv.innerHTML = html
+
+            // genuine clozes refer to those belong to current card and need to be answered, e.g. { {c2::abc} } on card2
+            // pseudo clozes refer to the opposite, e.g. { {c1::abc} } and { {c3::abc} } on card2
+            $('.genuine-cloze, .pseudo-cloze').each(function (index, elem) {
+                toggleCloze(elem, 'hint')
+            });
+
+
+            $('.pseudo-cloze').css('cursor', 'pointer')
+            $('.genuine-cloze').css('cursor', 'pointer')
+            $('#show-one-cloze-left').css('cursor', 'pointer')
+            $('#show-one-cloze-right').css('cursor', 'pointer')
+
+            // this prevents the blue selection briefly showing up on mobile when tapping on a cloze
+            /* $('.pseudo-cloze').addClass('disable-select')
+            $('.genuine-cloze').addClass('disable-select') */
+            $('#show-one-cloze-left').addClass('disable-select')
+            $('#show-one-cloze-right').addClass('disable-select')
+        }
+
+        function maybeScrollToFirstGenuineCloze() {
+            if ($('.genuine-cloze').length != 0) {
+                maybeScrollToCloze($('.genuine-cloze').first().get(0));
+            }
+        }
+
+
+        function setupClozeEvents() {
+            // we are not using enhancedClozeAddEventListener (which prevents duplicate event listeners) so we need to
+            // make sure that the listeners are only added once using the firstTimeLoadingEnhancedCloze variable
+            if (typeof firstTimeLoadingEnhancedCloze === 'undefined') {
+                firstTimeLoadingEnhancedCloze = false
+                if (/webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator
+                    .userAgent)) {
+                    setupIOsClozeClickEvents()
+                } else {
+                    setupDesktopAndAndroidClozeClickEvents()
+                }
+            }
+
+            setupClozeKeyEvents()
+        }
+        function setupDesktopAndAndroidClozeClickEvents() {
+            $(document).on('click', '.pseudo-cloze, .pseudo-cloze *', function (event) {
+                toggleCloze(event.target, 'toggle');
+            });
+
+            $(document).on('click', '.genuine-cloze, .genuine-cloze *', function (event) {
+                toggleCloze(event.target, 'toggle');
+            });
+
+            $(document).on('click', '#show-one-cloze-left', function (event) {
+                revealOneClozeOfAType(swapLeftAndRightBorderActions ? "pseudo" : "genuine");
+            });
+
+            $(document).on('click', '#show-one-cloze-right', function (event) {
+                revealOneClozeOfAType(swapLeftAndRightBorderActions ? "genuine" : "pseudo");
+            });
+        }
+
+        function setupIOsClozeClickEvents() {
+            // For ios click events don't work, so we use a custom click handler
+            addMobileClickHandler(
+                '.pseudo-cloze',
+                function (event) {
+                    toggleCloze(event.target, 'toggle');
+                }
+            )
+            addMobileClickHandler(
+                '.genuine-cloze',
+                function (event) {
+                    toggleCloze(event.target, 'toggle');
+                }
+            )
+            addMobileClickHandler(
+                '#show-one-cloze-left',
+                function (event) {
+                    revealOneClozeOfAType(swapLeftAndRightBorderActions ? "pseudo" : "genuine");
+                }
+            )
+            addMobileClickHandler(
+                '#show-one-cloze-right',
+                function (event) {
+                    revealOneClozeOfAType(swapLeftAndRightBorderActions ? "genuine" : "pseudo");
+                }
+            )
+        }
+
+        function addMobileClickHandler(selector, callback) {
+            // "click" events don't work on AnkiMobile, this is a workaround.
+            // This uses touchstart and touchend events to detect a click.
+            // If the touchend position is close enough to the touchstart position,
+            // the callback is called.
+
+            // This is the maximum distance the touchend position can differ from the touchstart position
+            // to still be considered a click
+            const distanceThreshold = 10;
+            // Stores the last touchstart position
+            let touchStartPosition = null;
+
+            $(document).on('touchstart', selector, function (event) {
+                const touches = event.originalEvent.touches;
+                if (touches.length === 1) {
+                    const touch = touches[0];
+                    touchStartPosition = {
+                        x: touch.clientX,
+                        y: touch.clientY
+                    };
+                } else {
+                    touchStartPosition = null;
+                }
+
+            });
+
+            $(document).on('touchend', selector, function (event) {
+                const changedTouches = event.originalEvent.changedTouches;
+                if (touchStartPosition && changedTouches.length === 1) {
+                    const changedTouch = changedTouches[0];
+                    const touchEndX = changedTouch.clientX;
+                    const touchEndY = changedTouch.clientY;
+                    const diffX = Math.abs(touchStartPosition.x - touchEndX);
+                    const diffY = Math.abs(touchStartPosition.y - touchEndY);
+                    if (diffX < distanceThreshold && diffY < distanceThreshold) {
+                        callback(event);
+                    }
+                }
+
+                touchStartPosition = null;
+            });
+        }
+
+        function setupClozeKeyEvents() {
+            window.enhancedClozeAddEventListener("keydown", (event) => {
+                if (shortcutMatcher(revealNextGenuineClozeShortcut)(event)) {
+                    revealOneClozeOfAType("genuine");
+                }
+                if (shortcutMatcher(revealAllGenuineClozesShortcut)(event)) {
+                    toggleAllClozesOfAType("genuine")
+                }
+                if (shortcutMatcher(revealNextPseudoClozeShortcut)(event)) {
+                    revealOneClozeOfAType("pseudo");
+                }
+                if (shortcutMatcher(revealAllPseudoClozesShortcut)(event)) {
+                    toggleAllClozesOfAType("pseudo");
+                }
+            })
+        }
+
+
+
+        function setupEditFieldDuringReview() {
+            moveEditClozesElm()
+
+            $("#enhanced-clozes").off('click').on('click', function (event) {
+                if (document.getElementsByClassName("EFDRC-outline").length == 0) return
+                if (!ctrlDown) return
+                activateEditFieldDuringReview()
+            });
+
+            function moveEditClozesElm() {
+                var editClozesElm = document.getElementById("edit-clozes")
+                document.getElementById("main-section").appendChild(editClozesElm)
+            }
+
+            function activateEditFieldDuringReview() {
+                var enhancedClozesElm = document.getElementById("enhanced-clozes")
+                var editClozesElm = document.getElementById("edit-clozes")
+                if (["inline", ""].includes(enhancedClozesElm.style.display)) {
+                    enhancedClozesElm.style.display = "none";
+                    editClozesElm.style.display = "inline";
+                } else {
+                    enhancedClozesElm.style.display = "inline";
+                    editClozesElm.style.display = "none";
+                }
+                setTimeout(() => {
+                    editable = editClozesElm.getElementsByClassName(
+                        "EFDRC-outline")[0]
+                    editable.onfocus()
+                    editable.focus()
+                })
+            }
+
+        }
+
+        function insertStyling() {
+            if (document.getElementById("enhanced-clozes-style")) return;
+
+            mainSection = document.getElementById("main-section")
+            style = document.createElement("style")
+
+            // this css is also in the css file, but inserting the css here is easier than updating the css file for all users
+            style.id = "enhanced-clozes-style"
+            style.innerHTML = `
+                .disable-select {
+                    -webkit-touch-callout: none;
+                    user-select: none;
+                }
+            `
+
+            if (underlineRevealedPseudoClozes) {
+                style.innerHTML += `
+                .pseudo-cloze:not([show-state="hint"]) {
+                    border-bottom: 1.5px solid #4285f4;
+                    padding-bottom: 1px;
+                }`
+            }
+            if (underlineRevealedGenuineClozes) {
+                style.innerHTML += `
+                .genuine-cloze:not([show-state="hint"]) {
+                    border-bottom: 1.5px solid #ff5c82;
+                    padding-bottom: 1px;
+                }`
+            }
+            mainSection.insertBefore(style, mainSection.children[0])
+        }
+
+        function revealOneClozeOfAType(clozeType) {
+            if (!["genuine", "pseudo"].includes(clozeType)) {
+                //console.log(`clozeType has unexpected value: ${clozeType}`)
+            }
+
+            if (!$(`.${clozeType}-cloze[show-state="hint"]`).length) {
+                $('#no-more-cloze').animate({
+                    display: "toggle",
+                }, 500);
+                return
+            }
+
+            var hiddenClozes = $(`.${clozeType}-cloze[show-state="hint"]`)
+            if (hiddenClozes.length != 0) {
+                revealCloze(hiddenClozes[0]);
+            }
+        }
+
+        window.toggleAllClozesOfAType = function (clozeType, hideAll=false) {
+            if (!["genuine", "pseudo"].includes(clozeType)) {
+                //console.log(`clozeType has unexpected value: ${clozeType}`)
+            }
+
+            var allRevealed = !$(`.${clozeType}-cloze[show-state="hint"`).length
+            $(`.${clozeType}-cloze`).each(function (index, elem) {
+                toggleCloze(elem, (allRevealed || hideAll) ? "hint" : "answer");
+            })
+        }
+
+        function revealCloze(elem) {
+            if (!isVisible(elem)) {
+                maybeScrollToCloze(elem);
+            } else {
+                toggleCloze(elem, 'answer');
+                if (!isVisible(elem)) {
+                    maybeScrollToCloze(elem);
+                } else { }
+                $(elem).hide(0);
+                $(elem).fadeIn(500);
+            }
+        }
+
+        function isVisible(elm) {
+            var rect = elm.getBoundingClientRect();
+            var viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+            return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
+        }
+
+        function maybeScrollToCloze(elem) {
+            if (!scrollToClozeOnToggle) return
+            $('html, body').animate({
+                scrollTop: $(elem).offset().top - 60
+            }, animateScroll ? 500 : 0);
+        }
+
+        function defineEnhancedClozeAddEventListener() {
+            // define enhancedClozeAddEventListener
+            // this function is almost identical to `document.addEventListener`
+            // but removes the event listener attached on previous card / front side
+            // using this function
+            if (typeof window.enhancedClozeEventListener != "undefined") {
+                for (const listener of window.enhancedClozeEventListener) {
+                    const type = listener[0]
+                    const handler = listener[1]
+                    document.removeEventListener(type, handler)
+                }
+            }
+            window.enhancedClozeEventListener = []
+
+            window.enhancedClozeAddEventListener = function (type, handler) {
+                document.addEventListener(type, handler)
+                window.enhancedClozeEventListener.push([type, handler])
+            }
+        }
+
+        var specialCharCodes = {
+            "-": "minus",
+            "=": "equal",
+            "[": "bracketleft",
+            "]": "bracketright",
+            ";": "semicolon",
+            "'": "quote",
+            "`": "backquote",
+            "\\": "backslash",
+            ",": "comma",
+            ".": "period",
+            "/": "slash",
+        };
+
+        // Returns function that match keyboard event to see if it matches given shortcut.
+        function shortcutMatcher(shortcut) {
+            var shortcutKeys = shortcut.toLowerCase().split(/[+]/).map(key => key.trim())
+            var mainKey = shortcutKeys[shortcutKeys.length - 1]
+            if (mainKey.length === 1) {
+                if (/\d/.test(mainKey)) {
+                    mainKey = "digit" + mainKey
+                } else if (/[a-zA-Z]/.test(mainKey)) {
+                    mainKey = "key" + mainKey
+                } else {
+                    var code = specialCharCodes[mainKey];
+                    if (code) {
+                        mainKey = code
+                    }
+                }
+            }
+            var ctrl = shortcutKeys.includes("ctrl")
+            var shift = shortcutKeys.includes("shift")
+            var alt = shortcutKeys.includes("alt")
+
+            var matchShortcut = function (ctrl, shift, alt, mainKey, event) {
+                if (event.originalEvent !== undefined) {
+                    event = event.originalEvent
+                }
+                if (mainKey !== event.code.toLowerCase()) return false
+                if (ctrl !== (event.ctrlKey || event.metaKey)) return false
+                if (shift !== event.shiftKey) return false
+                if (alt !== event.altKey) return false
+                return true
+            }.bind(window, ctrl, shift, alt, mainKey)
+
+            return matchShortcut
+        }
+
+        function setupKeyListenerForCtrlKey() {
+            window.enhancedClozeAddEventListener("keydown", function (ev) {
+                if (isCtrlKey(ev.code)) ctrlDown = true;
+            })
+            window.enhancedClozeAddEventListener("keyup", function (ev) {
+                if (isCtrlKey(ev.code)) ctrlDown = false;
+            })
+        }
+
+
+        function isCtrlKey(keycode) {
+            return ['ControlLeft', 'MetaLeft'].includes(keycode)
+        }
+
+        function showNextElement(elem) {
+            $(elem).next().show(0);
+        };
+
+        async function maybeInjectJquery() {
+            if (typeof jQuery === "undefined") {
+                await injectScript("_jquery.min.js");
+            }
+        }
+
+        async function injectScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.async = true;
+                script.onload = resolve;
+                script.onerror = (event) => {
+                    reject(new Error(`Script load error for source: ${src}`));
+                };
+                document.head.appendChild(script);
+            });
+        };
+
+    }
+
+
+
+    function cleanFullText(str) {
+        if (!str) return '';
+        return str
+            .replace(/<[^>]*>/g, '') // HTML
+            .replace(/\{\{c\d+::([^\{\}]+?)(::[^\{\}]+?)?\}\}/g, '$1') // cloze
+            .replace(/[\u200B-\u200D\uFEFF]/g, '')
+            .replace(/&(ZeroWidthSpace|zwnj|zwj|feff|nbsp|amp|lt|gt|quot|apos);/g, ' ')
+            .replace(/\s+/g, ' ') 
+            .trim();
+    }
+    
+    function ClearHTML(str) {
+        if (!str) return '';
+        return str
+            .replace(/<[^>]*>/g, '') // HTML
+            .replace(/[\u200B-\u200D\uFEFF]/g, '')
+            .replace(/&(ZeroWidthSpace|zwnj|zwj|feff|nbsp|amp|lt|gt|quot|apos);/g, '')     
+    }
+
+    
+    function stopSpeak() {
+        /* AnkiDroidJS API */
+        if (typeof apiAnkiDroid !== 'undefined' && apiAnkiDroid !== null) {
+            try {               
+                apiAnkiDroid.ankiTtsStop();                                                
+            } catch (e) {
+                console.error("Error AnkiDroid API:", e);                
+            }
+        }
+        else {
+            // For the web version
+            try {
+                if (('speechSynthesis' in window)) {                                        
+                    let ret = window.speechSynthesis.speaking;
+                    if (ret) {
+                        window.speechSynthesis.cancel();
+                    }
+                }                                    
+            } catch(e) {
+                console.error('❌ TTS error:', e);                
+            }
+        }
+    }
+    
+    
+    function speakText(txtSpeak, langSS, voiceName = '', rate=1.0, pitch=1.0, volume=1.0, stopPrevious = true) {        
+        /* AnkiDroidJS API */
+        if (typeof AnkiDroidJS !== 'undefined') {
+            async function apiADResult() {
+                try { 
+                    apiAnkiDroid.ankiTtsSetSpeechRate(rate);
+                    apiAnkiDroid.ankiTtsSetPitch(pitch);
+                    // For AnkiDroid, you can transmit voice in the "en_US" or "en-US" format
+                    const langCode = langSS.replace('_', '-');
+                    apiAnkiDroid.ankiTtsSetLanguage(langCode); 
+                } catch(e){}
+                try { apiAnkiDroid.ankiTtsStop(); } catch(e){}
+                try { apiAnkiDroid.ankiTtsSpeak(txtSpeak); } catch(e){}            
+            }
+            apiADResult();
+        }
+        else {
+            
+            // For the web version
+            try {
+                if (!('speechSynthesis' in window)) {
+                    console.warn('Speech synthesis not supported');
+                    return;
+                }
+        
+                if (stopPrevious && window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                }
+        
+                const utterance = new SpeechSynthesisUtterance(txtSpeak);
+                const availableVoices = window.speechSynthesis.getVoices();
+                
+                // Normalizing the language
+                const normalizedLang = (langSS || 'en-US').replace('_', '-');
+                utterance.lang = normalizedLang;
+        
+               
+                let selectedVoice = null;
+        
+                // Check that voiceName is passed and is a string
+                if (voiceName && typeof voiceName === 'string' && voiceName.trim() !== '') {
+                    // Search for a voice
+                    selectedVoice = availableVoices.find(voice => {
+                        const voiceNameLower = voiceName.toLowerCase().trim();
+                        const voiceNameNormalized = voiceNameLower.replace(/\s/g, '');
+                        
+                        return voice.name === voiceName ||
+                               voice.name.toLowerCase() === voiceNameLower ||
+                               voice.name.toLowerCase().includes(voiceNameLower) ||
+                               voice.name.replace(/\s/g, '').toLowerCase() === voiceNameNormalized;
+                    });
+                }
+        
+                // If no voice is found, search by language
+                if (!selectedVoice) {
+                    // First, an exact match
+                    selectedVoice = availableVoices.find(voice => 
+                        voice.lang === normalizedLang
+                    );
+                    
+                    // Then by the first two letters
+                    if (!selectedVoice) {
+                        const langPrefix = normalizedLang.substring(0, 2);
+                        selectedVoice = availableVoices.find(voice => 
+                            voice.lang.startsWith(langPrefix)
+                        );
+                    }
+                }
+        
+                // If there's still no voice, take the first available one
+                if (!selectedVoice && availableVoices.length > 0) {
+                    selectedVoice = availableVoices[0];
+                }
+        
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                    if (selectedVoice.lang) {
+                        utterance.lang = selectedVoice.lang;
+                    }
+                }
+
+                utterance.rate = rate;
+                utterance.pitch = pitch;
+                utterance.volume = volume;
+        
+                utterance.onstart = function() {
+                    //console.log('🎤 Speaking:', txtSpeak.substring(0, 50) + '...');
+                    //console.log('lang='+String(utterance.lang)+' rate='+String(rate) + ' pitch='+String(pitch) + ' ');
+                };
+        
+                utterance.onend = function() {
+                    // console.log('✅ Speaking finished');
+                };
+        
+                utterance.onerror = function(event) {
+                    //console.error('❌ TTS error:', event.error);
+                };
+        
+                window.speechSynthesis.speak(utterance);
+        
+            } catch(e) {
+                console.error('❌ TTS error:', e);
+            }
+            
+        }
+    }
+    
+    // Helper function for normalizing language code
+    function normalizeLangCode(langCode) {
+        // Convert "en_US" to "en-US"
+        return langCode.replace('_', '-');
+    }
+    
+    
+    
+    function ttssoundall() {
+        var st = window.getSettingsFromUI();        
+        if(st.soundEnabled) {     
+            let selection = window.getSelection();
+            let selectedText = selection ? selection.toString().trim() : '';
+            if (selectedText.length > 0) {                
+                speakText(selectedText, st.language, "", st.speed, 1.0, 1.0);
+            }
+            else {
+                let el = document.getElementById('content-without-close');
+                //speakText('test 1', st.language, "", st.speed, 1.0, 1.0);
+                if(el) {                    
+                    let txt = el.innerText;    
+                    txt = cleanFullText(txt);
+                    //console.log("ttssoundall");
+                    //console.log("st.speed="+String(st.speed));
+                    //console.log("st.language="+String(st.language));
+                    speakText(txt, st.language, "", st.speed, 1.0, 1.0);
+                } 
+            }                           
+        }        
+    }
+    
+
+    function onlySimpleText(str) {     
+        /// Convert to plain text
+        // Romanian substitutions
+        str = str.replace(/[Ș]/gu, "Ş");
+        str = str.replace(/[ș]/gu, "ş");
+        str = str.replace(/[Ț]/gu, "Ţ");
+        str = str.replace(/[ț]/gu, "ţ");
+        // Russian replacements
+        str = str.replace(/[ё]/gu, "е");
+        str = str.replace(/[Ё]/gu, "Е");
+        str = str.replace(/[ӂ]/gu, "ж");
+        str = str.replace(/[Ӂ]/gu, "Ж");
+        // Remove HTML tags
+        str = str.replace(/<[^>]*>/g, "");
+        // Remove Unicode punctuation (apostrophes, quotation marks, periods, commas, brackets, dashes, etc.)
+        str = str.replace(/\p{P}+/gu, " ");
+        // Remove other "symbols" like ©, ™, § — Symbol category
+        str = str.replace(/\p{S}+/gu, " ");
+        str = str.replace(/​/gu, ""); // zerowidthspace
+        str = str.replace(/ /gu, ""); // U+200A
+        // Normalize spaces
+        str = str.replace(/\s+/g, " ");
+        return str.toLowerCase().trim();
+    }
+
+
+
+
+
+    function isGoodInput(strField, elInput) {                  
+        let str1 = strField;
+        let str2 = "";              
+        let isgood = false;
+        if(elInput){
+            str1 = ClearHTML(str1);
+            str1 = onlySimpleText(str1);            
+            str2 = elInput.innerText;                   
+            str2 = ClearHTML(str2);
+            str2 = onlySimpleText(str2);
+            if(str1 === str2) {
+                elInput.classList.remove("colorInput");
+                elInput.classList.remove("ErrorInput");
+                if( !elInput.classList.contains("goodInput")) {
+                    elInput.classList.add("goodInput"); // elInput.style.color = "green";                  
+                }
+                isgood = true;                    
+            }    
+            else if(str1.indexOf(str2)==0 || str2.indexOf(str1+" ")==0) {                
+                elInput.classList.remove("goodInput");
+                elInput.classList.remove("ErrorInput");
+                elInput.classList.add("colorInput"); // elInput.style.color = "#00aeff";            
+            }        
+            else {                
+                elInput.classList.remove("colorInput");
+                elInput.classList.remove("goodInput");
+                elInput.classList.add("ErrorInput"); // el2.style.color = "red";                             
+            }        
+            
+            
+            if(!isgood && str1.length > 0) {
+                setTimeout(() => {
+                    let strInp = elInput.innerHTML; 
+                    if(strInp.endsWith(' ')) {
+                        elInput.innerHTML = elInput.innerHTML.slice(0, -1);
+                        Suggest1(strField, elInput);    
+                    }
+                    else if(strInp.endsWith(' '+'\u200B')) {
+                        elInput.innerHTML = elInput.innerHTML.slice(0, -2);
+                        Suggest1(strField, elInput);    
+                    }
+                    else if(strInp.endsWith(' </span>'+'\u200B')) {
+                        elInput.innerHTML = elInput.innerHTML.slice(0, -9)+'</span>'+'\u200B';
+                        Suggest1(strField, elInput);    
+                    }
+                    else if(strInp.endsWith('<font color="#ff00ff"> </font>')) {
+                        elInput.innerHTML = elInput.innerHTML.slice(0, -1*String('<font color="#ff00ff"> </font>').length);
+                        Suggest1(strField, elInput);    
+                    }
+                    
+                }, 50);
+            }
+            
+        }     
+    }
+
+    function ClearHTMLAllClass(className) {        
+        let els = document.getElementsByClassName(className);
+        for (let i = 0; i < els.length; i++) {
+            els[i].innerHTML = "";
+            els[i].classList.remove('goodInput');
+        }
+    }
+            
+    function ClearHTMLOneEl(event) {          
+        event.stopPropagation();    
+        event.preventDefault();     
+        
+        let button = event.currentTarget;
+        let elDivInput = button.closest('.clozeinput');
+                
+        if (!elDivInput) {
+            elDivInput = button.previousElementSibling;
+        }
+        
+        if(elDivInput) {
+            elDivInput.innerHTML = "";
+            elDivInput.classList.remove('goodInput');
+            elDivInput.focus();            
+        }
+    }
+    
+    
+    function handleHintClick(event) {
+        // Stopping the bubbling to avoid duplication
+        event.stopPropagation();
+
+        let parent = event.currentTarget.parentElement;
+        
+        let clickEvent = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window
+        });
+        
+        if (parent) {
+            parent.dispatchEvent(clickEvent);
+        }
+        
+        //console.log('Hint clicked:');
+    }
+
+
+    function moveCursorToEnd(el) {
+        el.focus(); // focus required
+        const range = document.createRange();
+        const sel = window.getSelection();
+        // take the last child node
+        const lastNode = el.lastChild;
+        if (lastNode) {
+            if (lastNode.nodeType === Node.TEXT_NODE) {
+                // if it's a text node, place the cursor at the end of the text
+                range.setStart(lastNode, lastNode.textContent.length);
+            } else {
+                // if it's an element (for example, span), put it after it
+                range.setStartAfter(lastNode);
+            }
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+    }
+
+   
+    function Suggest1(strField, elInput) {     
+        //console.log('Suggest1');   
+        if (!elInput) return;
+
+        let str1 = strField;
+        str1 = ClearHTML(str1);
+        let str2 = elInput.innerText;        
+        str2 = ClearHTML(str2);
+
+        let n2 = str2.length;
+        let n1 = str1.length;
+
+        elInput.focus();
+
+        let nextChar = " ";
+        if (n2 < n1) {
+            nextChar = str1[n2];
+            if( nextChar==" " ) elInput.innerHTML += " ";
+            else {                               
+                elInput.innerHTML += `<span class="suggested" style="color: #ff00ff;">` + nextChar + `</span>​`;
+            }
+        }
+        moveCursorToEnd(elInput);
+        isGoodInput(strField, elInput);
+    }
+
+    function fkeydown(strField, event) {        
+        //console.log('fkeydown');                
+        if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+            event.target.contentEditable = "false";
+
+            setTimeout(() => {
+                event.target.contentEditable = "true";
+            }, 0);
+
+            return;
+        }     
+
+        
+        if (event.key === "Enter") { // Enter -> Tab        
+            event.preventDefault(); // cancel the standard behavior 
+            let focusable = document.querySelectorAll(
+                'span[contenteditable="true"],div[contenteditable="true"]'
+            );
+            let currentIndex = Array.from(focusable).indexOf(event.target);
+            
+            if (currentIndex < focusable.length - 1) {              
+                focusable[currentIndex + 1].focus();
+            } else {                
+                focusable[0].focus();
+            }   
+
+            setTimeout(() => {                    
+                event.target.dispatchEvent(tabEvent);  
+            }, 100);           
+        }        
+        else {            
+            
+            if (event.key === 'Backspace') {
+                //console.log('=== Backspace pressed ===');
+                //console.log('event.ctrlKey:', event.ctrlKey);
+                
+                if (event.ctrlKey) {
+                    event.preventDefault();                    
+                    event.target.innerHTML = '';
+                    event.target.textContent = '';            
+                    event.target.focus();
+                    event.target.dispatchEvent(new Event('input', { bubbles: true }));    
+                } else {
+                    // console.log('Regular Backspace');
+                }
+            }
+
+  
+            
+        }
+    }
+    
+           
+    
+    
+    
+    
+   function initialСheck(event) {
+        let el = event.target;
+        if (!el) return;        
+        
+        // Check that this is the correct div
+        if (!el.classList.contains('clozeinput') || 
+            !el.classList.contains('editable')) {
+            return;
+        }
+        
+        // Check for emptiness
+        let txt = el.textContent || '';
+        txt = txt.replace(/[\u200B-\u200D\uFEFF]/g, '');
+        
+        if (txt === '') {
+            el.innerHTML = '';
+            el.focus();                            
+        }
+        else {
+            if(txt.length == 1) {
+                removeFontTags(event.target);               
+            }
+        }
+    }
+
+
+
+    
+    
+    // del <font>
+    function removeFontTags(element) {
+        let repl = false;
+        const fonts = element.querySelectorAll('font');
+        fonts.forEach(font => {
+            const text = font.textContent || '';
+            const parent = font.parentNode;
+            const textNode = document.createTextNode(text);
+            parent.replaceChild(textNode, font);
+            repl = true;
+        });
+        if(repl) {
+             moveCursorToEnd(element);
+        }
+    }
+
+
+
+
+    // This function is defined outside of enhancedClozesMain because it is used on the back side of the card as well
+    function toggleCloze(elem, displayOption) {
+
+        if (elem == null) return
+
+        // if the element is not a cloze get its ancestor cloze
+        if (elem.classList.contains("genuine-cloze") || elem.classList.contains("pseudo-cloze"))
+            cloze = elem
+        else {
+            cloze = $(elem).closest(".genuine-cloze")
+            if (cloze.length === 0)
+                cloze = $(elem).closest(".pseudo-cloze")
+        }
+
+        var index = $(cloze).attr('index');
+        var answer = enhancedClozesData["answers"][index]
+        var hint = enhancedClozesData["hints"][index]
+
+        if (!showHintsForPseudoClozes && cloze.classList.contains('pseudo-cloze')) {
+            hint = ""
+        }
+
+        let answerstartsWith = false;
+        if ( !(!answer || typeof answer !== 'string')) {
+            answerstartsWith = answer.startsWith('#');
+        }
+        
+        if (revealPseudoClozesByDefault || answerstartsWith) {
+            if (answerstartsWith) {
+                answer = answer.slice(1)
+            }            
+
+            if ($(cloze).attr('class') == 'pseudo-cloze') {
+                $(cloze).attr('show-state', 'answer');
+                $(cloze).html(answer);
+                return
+            }
+        }
+
+        var st = window.getSettingsFromUI();
+        if (displayOption == 'answer' || (displayOption == 'toggle' && $(cloze).attr('show-state') == 'hint')) {
+            $(cloze).attr('show-state', 'answer');
+            $(cloze).html(answer);    
+            if(st.soundEnabled) {
+                let txt = answer;
+                //console.log("ttssoundall");
+                //console.log("st.speed="+String(st.speed));
+                //console.log("st.language="+String(st.language));
+                speakText("", ""); // stop
+                speakText(txt, st.language, "", st.speed, 1.0, 1.0);            
+            }
+            
+        } else if (displayOption == 'hint' || (displayOption == 'toggle' && $(cloze).attr('show-state') == 'answer')) {
+            speakText("", ""); // stop
+            $(cloze).attr('show-state', 'hint');
+            hint = '&#8199;[&#8239;' + '<span class="clozehint" onclick="handleHintClick(event);">'+hint+'</span>';
+            
+            if(hint!="") {
+                    hint += "&#8239";
+                }               
+            let safeAnswer = encodeURIComponent(answer);
+            if(st.inputMode) {
+                hint += '<div contenteditable="true" class="clozeinput editable visibleIMP" ';    
+            }
+            else {
+                hint += '<div contenteditable="true" class="clozeinput editable hiddenIMP" ';    
+            }
+            
+            hint += 'onclick="event.stopPropagation();" ';
+            hint += `oninput="initialСheck(event); isGoodInput(decodeURIComponent(\`${safeAnswer}\`), event.target);"`;
+            hint += `onkeydown="fkeydown(decodeURIComponent(\`${safeAnswer}\`), event);" `;                
+            // hint += `onkeyup="initialСheck(event);"`;            
+            if(st.inputMode) {
+                hint += '></div><button onclick="ClearHTMLOneEl(event)" class="btnClear visibleIMP" title="Clear the input field [Ctrl+BS]" style="border-radius: 7px;">CLR</button>';
+            }
+            else {
+                hint += '></div><button onclick="ClearHTMLOneEl(event)" class="btnClear hiddenIMP" title="Clear the input field" style="border-radius: 7px;">CLR</button>';
+            }
+                        
+            hint += '&#8239;]&#8199;';
+            $(cloze).html(hint);
+            
+        }
+
+        // rerun mathjax on the document so that the cloze text gets formatted
+        // ... for MathJax 2
+        try {
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+        } catch { }
+        // ... for MathJax 3
+        try {
+            MathJax.typesetPromise()
+        } catch { }
+
+    }
+
+
+enhancedClozesMain();
+    
+</script>
+
+<!-- Contents without close -->
+<div id="content-without-close" style="display: none;"></div>
+<script>  
+  var cleanHtml = document.getElementById('enhanced-cloze-content').innerHTML;  
+  var regex = /\{\{c\d+::([^\{\}]+?)(::[^\{\}]+?)?\}\}/g;  
+  while (regex.test(cleanHtml)) {
+    cleanHtml = cleanHtml.replace(regex, '$1');
+  }
+  document.getElementById('content-without-close').innerHTML = cleanHtml;
+</script>
