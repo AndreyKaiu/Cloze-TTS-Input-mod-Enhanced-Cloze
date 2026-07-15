@@ -12,9 +12,7 @@
 }
 
 #card-body {
-    /* font: 17px/1.65em 'Avenir Next'; */
-    /* font-family: arial;
-    font-size: 20px; */
+    /* font: 17px/1.65em 'Avenir Next'; */    
     line-height: 1.5;
     text-align: justify;
     margin-top: 30px;
@@ -23,8 +21,27 @@
 
    
 .content {
-    padding-left: 0.5em;
+    /* padding-left: 0.5em; */
+    padding-left: 10px;
+    padding-right: 10px;
     border-left: 4px solid transparent;
+}
+
+#all-section {
+    padding-left: 10px;
+    padding-right: 10px;    
+}
+
+#hrline {
+    border-top: 0px;
+    border-right: 0px;
+    border-left: 0px;
+    border-bottom: 2px;
+    border-style:solid;
+    line-height: 1;
+    border-color: gray;
+    margin: 4px 6px 24px 10px;
+    min-height: 16px;
 }
 
 .header {
