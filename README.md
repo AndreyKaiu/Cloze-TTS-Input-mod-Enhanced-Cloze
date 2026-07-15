@@ -29,6 +29,27 @@ The settings for this add-on can be found in the Anki program menu: «Tools -> C
 
 This add-on's settings are located in a separate tab. You can disable the floating toolbar if it bothers you. Disabling TTS and text input is more useful in AnkiDroid, as it only remembers settings for the current session (in Anki itself and on the website, your preferences are remembered for the current device).
 
+This add-on can be similar to the standard "Enhanced Cloze" at any time, but if a particular map requires careful text entry, it can be quickly toggled using the buttons below. Opening a "Cloze" field is only announced if TTS is enabled. If both are disabled, only the "Hide all" button remains available, which is useful when there are many fields or when you're using AnkiDroid and therefore can't access keyboard hotkeys.
+
+#### HELP AND SUPPORT
+
+**Please do not use reviews for bug reports or support requests.**<br>
+**And be sure to like,** as your support is always needed. Thank you.
+I don't get notified of your reviews, and properly troubleshooting an issue through them is nearly impossible. Instead, please either use the [issue tracker (preferred),](https://github.com/AndreyKaiu/Cloze-TTS-Input-mod-Enhanced-Cloze/issues) add-on [support forums](https://forums.ankiweb.net/t/advanced-browser-mod-kaiu-2026-official-support/68382), or just message me at [andreykaiu@gmail.com.](mailto:andreykaiu@gmail.com) Constructive feedback and suggestions are always welcome!
+
+
+#### VERSIONS
+- 1.14, date: 2026-07-15. First release. The number is from the modified addon.
+
+
+=========================
+
+**See my other addons and decks here:** [https://ankiweb.net/shared/by-author/1188253433](https://ankiweb.net/shared/by-author/1188253433) 
+
+=========================
+
+
+
 
 
 
