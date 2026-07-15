@@ -15,6 +15,28 @@ Each input field has a button that allows you to quickly clear the field (type o
 
 <img width="480" alt="2" src="https://github.com/user-attachments/assets/292db52f-bd74-4510-8750-94daedb55782" />
 
+The image above shows that text has been entered into one field, and it's green with a green border, indicating it's completely correct. In another field, purple indicates that the text was entered using the hint (press the space bar), and then the red characters indicate that they're incorrect and need to be corrected. In the third field, arrows indicate that clicking on these areas will expand the field to the same size as the field below. This third field is being entered correctly, so it's black for now.
+
+**Important!** It's important to use the spacebar hint correctly. Before you press the spacebar, try to remember what character might be there. Even if you don't know the whole word, don't rush to press the spacebar; instead, press it slowly and try to guess. By doing this, you're essentially using the same principle as in the "cloze" type, but for each character. This will help you memorize the text faster.
+
+<img width="480" alt="3" src="https://github.com/user-attachments/assets/816e3850-8482-4c52-8a1e-1a512b126015" />
+
+The image above shows that if you prefer a particular section of text, a floating panel appears with buttons where you can speak the text, copy it, translate it, search for it in Google, use Google's AI as a translator, and close the panel. This panel is very useful for language learning, as it's often important to speak a text section by section and get a translation.
+
+The settings for this add-on can be found in the Anki program menu: «Tools -> Cloze TTS-Input -> Config».
+
+<img width="480" alt="4" src="https://github.com/user-attachments/assets/10e36dde-54fa-486d-ac02-1796f9ea3bf4" />
+
+This add-on's settings are located in a separate tab. You can disable the floating toolbar if it bothers you. Disabling TTS and text input is more useful in AnkiDroid, as it only remembers settings for the current session (in Anki itself and on the website, your preferences are remembered for the current device).
+
+
+
+
+
+
+
+
+
 
 
 
